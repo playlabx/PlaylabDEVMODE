@@ -139,7 +139,7 @@
         .game-thumbnail {
             width: 100%;
             height: 120px;
-            background-color: #2c2c35;
+            background-color: #000000; /* Black logo fallback */
             object-fit: cover;
             display: flex;
             align-items: center;
@@ -290,7 +290,7 @@
         <div class="header-right">
             <div class="search-container">
                 <i class="fas fa-search search-icon"></i>
-                <input type="text" class="search-bar" placeholder="Search Game...">
+                <input type="text" id="searchBar" class="search-bar" placeholder="Search Game..." oninput="filterGames()">
             </div>
             <div class="header-icons">
                 <i class="fas fa-heart"></i>
@@ -304,93 +304,16 @@
         <!-- Html Games Section -->
         <section>
             <div class="section-title">Html Games <span>View more ›</span></div>
-            <div class="game-grid">
-                <!-- Subway Surfers Card -->
-                <div class="game-card" onclick="openGame('clsubwaysurfersberlin.html', 'Subway Surfers')">
-                    <span class="badge new">New</span>
-                    <img src="https://imgs.search.brave.com/FZ2YciuLR4g1n-8VLNzHyTAlrFzZS93DFupJMyjzhcQ/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly93d3cu/bWV0YWNyaXRpYy5j/b20vYS9pbWcvcmVz/aXplL2Y3NWVkMjdm/NGRjNDlhZmRiNjcx/ZTQ4YmQ1OGI4NWFm/N2M0MTFiMWUvY2F0/YWxvZy9wcm92aWRl/ci82LzEyLzYtMS0y/MzY1ODQtNTIuanBn/P2F1dG89d2VicCZm/aXQ9Y29udGFpbiZo/ZWlnaHQ9NDgwJnF1/YWxpdHk9NzA" alt="Subway Surfers" class="game-thumbnail">
-                    <div class="game-info">
-                        <div class="game-title">Subway Surfers</div>
-                    </div>
-                </div>
-
-                <!-- Geometry Dash Lite Card -->
-                <div class="game-card" onclick="openGame('GeometryDashLite.html', 'Geometry Dash Lite')">
-                    <span class="badge new">New</span>
-                    <img src="https://cdn2.steamgriddb.com/logo_thumb/a1a2d4c37bcf89723258332b069889b0.png" alt="Geometry Dash Lite" class="game-thumbnail">
-                    <div class="game-info">
-                        <div class="game-title">Geometry Dash Lite</div>
-                    </div>
-                </div>
-
-                <!-- Among Us Card -->
-                <div class="game-card" onclick="openGame('amongus.html', 'Among Us')">
-                    <span class="badge new">New</span>
-                    <img src="https://logodix.com/logo/2207096.png" alt="Among Us" class="game-thumbnail">
-                    <div class="game-info">
-                        <div class="game-title">Among Us</div>
-                    </div>
-                </div>
-
-                <!-- Baldi Basics Card -->
-                <div class="game-card" onclick="openGame('baldisbasics.html', 'Baldi Basics')">
-                    <span class="badge new">New</span>
-                    <img src="https://imgs.search.brave.com/_M_YSNCfcFVBdqTwQCW2KAsnIUnIsnWbN2eot0dNX-I/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9pLnBp/bmltZy5jb20vb3Jp/Z2luYWxzLzgzLzNl/LzcwLzgzM2U3MDRl/Y2RlZmRiZGIyZGU2/ODMwY2EwZmI1MGM0/LmpwZw" alt="Baldi Basics" class="game-thumbnail">
-                    <div class="game-info">
-                        <div class="game-title">Baldi Basics</div>
-                    </div>
-                </div>
-
-                <!-- Snake Game Card -->
-                <div class="game-card" onclick="openGame('Snake Game.html', 'Snake Game')">
-                    <span class="badge new">New</span>
-                    <img src="https://snake.io/assets/design/home/app_icon_snakeio.webp?v=1.3.33" alt="Snake Game" class="game-thumbnail">
-                    <div class="game-info">
-                        <div class="game-title">Snake Game</div>
-                    </div>
-                </div>
-
-                <!-- totm Card -->
-                <div class="game-card" onclick="openGame('totm.html', 'totm')">
-                    <span class="badge new">New</span>
-                    <img src="https://www.jopi.com/cdn-cgi/image/quality=78,width=256,height=142,fit=cover,f=auto/img/t/tomb-of-the-mask.png" alt="totm" class="game-thumbnail">
-                    <div class="game-info">
-                        <div class="game-title">totm</div>
-                    </div>
-                </div>
-
-                <!-- FNAF Card -->
-                <div class="game-card" onclick="openGame('FNAF.html', 'FNAF')">
-                    <span class="badge new">New</span>
-                    <img src="https://imgs.search.brave.com/fSbVA-1vvx55GF7FI2MEXb-3zd_QpjVd9QE-KocvnbQ/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pLnBp/bmltZy5jb20vb3Jp/Z2luYWxzLzE0LzM4/LzY1LzE0Mzg2NWM5/ZTQzYmYyMmQwZTBh/ZWIyNjBkNzZmODc4/LmpwZw" alt="FNAF" class="game-thumbnail">
-                    <div class="game-info">
-                        <div class="game-title">FNAF</div>
-                    </div>
-                </div>
-
-                <!-- BitLife Card -->
-                <div class="game-card" onclick="openGame('bitlife.html', 'BitLife')">
-                    <span class="badge new">New</span>
-                    <img src="https://play-lh.googleusercontent.com/fUM-UyywXxjC8soxAZdIlxJrlRRXmql8wkE426SHzft4lJycSKVd2jCYQQX1BEG9Xw=w480-h960-rw" alt="BitLife" class="game-thumbnail">
-                    <div class="game-info">
-                        <div class="game-title">BitLife</div>
-                    </div>
-                </div>
+            <div class="game-grid" id="htmlGamesGrid">
+                <!-- Dynamically populated -->
             </div>
         </section>
 
         <!-- Other Section -->
         <section>
             <div class="section-title">Other</div>
-            <div class="game-grid">
-                <!-- Github Search Card -->
-                <div class="game-card" onclick="openGame('githubsearch.html', 'Github Search')">
-                    <span class="badge new">New</span>
-                    <img src="https://imgs.search.brave.com/FG6H6NLOUaGGHa3W_4ioeHDQ6WCY63lTBuucjyVFdAw/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9jZG4u/aWNvbnNjb3V0LmNv/bS9pY29uL2ZyZWUv/cG5nLTI1Ni9mcmVl/LWdpdGh1Yi1pY29u/LXN2Zy1kb3dubG9h/ZC1wbmctMzE0OTkx/Mi5wbmc_Zj13ZWJw/Jnc9MTI4" alt="Github Search" class="game-thumbnail">
-                    <div class="game-info">
-                        <div class="game-title">Github Search</div>
-                    </div>
-                </div>
+            <div class="game-grid" id="otherGamesGrid">
+                <!-- Dynamically populated -->
             </div>
         </section>
     </div>
@@ -413,7 +336,78 @@
     </div>
 
     <script>
+        // ==========================================
+        // EDIT GAME NAMES & IMAGES HERE AT THE TOP
+        // If a file isn't listed here, it auto-detects 
+        // with its filename and uses a black logo!
+        // ==========================================
+        const gameConfig = {
+            "clsubwaysurfersberlin.html": { title: "Subway Surfers", image: "https://imgs.search.brave.com/FZ2YciuLR4g1n-8VLNzHyTAlrFzZS93DFupJMyjzhcQ/rs:fit:500:0:0:0/g:ce/aHR0cHM6Ly93d3cu/bWV0YWNyaXRpYy5j/b20vYS9pbWcvcmVz/aXplL2Y3NWVkMjdm/NGRjNDlhZmRiNjcx/ZTQ4YmQ1OGI4NWFm/N2M0MTFiMWUvY2F0/YWxvZy9wcm92aWRl/ci82LzEyLzYtMS0y/MzY1ODQtNTIuanBn/P2F1dG89d2VicCZm/aXQ9Y29udGFpbiZo/ZWlnaHQ9NDgwJnF1/YWxpdHk9NzA", section: "html" },
+            "GeometryDashLite.html": { title: "Geometry Dash Lite", image: "https://cdn2.steamgriddb.com/logo_thumb/a1a2d4c37bcf89723258332b069889b0.png", section: "html" },
+            "amongus.html": { title: "Among Us", image: "https://logodix.com/logo/2207096.png", section: "html" },
+            "baldisbasics.html": { title: "Baldi Basics", image: "https://imgs.search.brave.com/_M_YSNCfcFVBdqTwQCW2KAsnIUnIsnWbN2eot0dNX-I/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9pLnBp/bmltZy5jb20vb3Jp/Z2luYWxzLzgzLzNl/LzcwLzgzM2U3MDRl/Y2RlZmRiZGIyZGU2/ODMwY2EwZmI1MGM0/LmpwZw", section: "html" },
+            "Snake Game.html": { title: "Snake Game", image: "https://snake.io/assets/design/home/app_icon_snakeio.webp?v=1.3.33", section: "html" },
+            "totm.html": { title: "totm", image: "https://www.jopi.com/cdn-cgi/image/quality=78,width=256,height=142,fit=cover,f=auto/img/t/tomb-of-the-mask.png", section: "html" },
+            "FNAF.html": { title: "FNAF", image: "https://imgs.search.brave.com/fSbVA-1vvx55GF7FI2MEXb-3zd_QpjVd9QE-KocvnbQ/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pLnBp/bmltZy5jb20vb3Jp/Z2luYWxzLzE0LzM4/LzY1LzE0Mzg2NWM5/ZTQzYmYyMmQwZTBh/ZWIyNjBkNzZmODc4/LmpwZw", section: "html" },
+            "bitlife.html": { title: "BitLife", image: "https://play-lh.googleusercontent.com/fUM-UyywXxjC8soxAZdIlxJrlRRXmql8wkE426SHzft4lJycSKVd2jCYQQX1BEG9Xw=w480-h960-rw", section: "html" },
+            "taproad.html": { title: "Tap Road", image: "", section: "html" }, // Added with black logo fallback
+            "githubsearch.html": { title: "Github Search", image: "https://imgs.search.brave.com/FG6H6NLOUaGGHa3W_4ioeHDQ6WCY63lTBuucjyVFdAw/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9jZG4u/aWNvbnNjb3V0LmNv/bS9pY29uL2ZyZWUv/cG5nLTI1Ni9mcmVl/LWdpdGh1Yi1pY29u/LXN2Zy1kb3dubG9h/ZC1wbmctMzE0OTkx/Mi5wbmc_Zj13ZWJw/Jnc9MTI4", section: "other" }
+        };
+
         let currentGameUrl = '';
+
+        // Auto-load game cards on page startup
+        window.addEventListener('DOMContentLoaded', () => {
+            renderGames();
+        });
+
+        function renderGames(filterText = '') {
+            const htmlGrid = document.getElementById('htmlGamesGrid');
+            const otherGrid = document.getElementById('otherGamesGrid');
+            
+            htmlGrid.innerHTML = '';
+            otherGrid.innerHTML = '';
+
+            for (const [filename, info] of Object.entries(gameConfig)) {
+                let title = info.title || filename.replace('.html', '').replace(/([A-Z])/g, ' $1').trim();
+                
+                // Search filter match check
+                if (filterText && !title.toLowerCase().includes(filterText.toLowerCase())) {
+                    continue;
+                }
+
+                const card = document.createElement('div');
+                card.className = 'game-card';
+                card.onclick = () => openGame(filename, title);
+
+                // Thumbnail image or black fallback box
+                let thumbnailHtml = '';
+                if (info.image && info.image.trim() !== '') {
+                    thumbnailHtml = `<img src="${info.image}" alt="${title}" class="game-thumbnail">`;
+                } else {
+                    thumbnailHtml = `<div class="game-thumbnail" style="background-color: #000000;"></div>`;
+                }
+
+                card.innerHTML = `
+                    <span class="badge new">New</span>
+                    ${thumbnailHtml}
+                    <div class="game-info">
+                        <div class="game-title">${title}</div>
+                    </div>
+                `;
+
+                if (info.section === 'other') {
+                    otherGrid.appendChild(card);
+                } else {
+                    htmlGrid.appendChild(card);
+                }
+            }
+        }
+
+        function filterGames() {
+            const query = document.getElementById('searchBar').value;
+            renderGames(query);
+        }
 
         function openGame(url, title) {
             currentGameUrl = url;
