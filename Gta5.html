@@ -3,20 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GTA5</title>
+    <title>GTA5 Loader</title>
+    
+    <!-- Load polyfill for web components -->
+    <script src="https://unpkg.com/@webcomponents/webcomponentsjs@2.8.0/webcomponents-bundle.js"></script>
+    
+    <!-- Load the x-frame-bypass script -->
+    <script src="https://unpkg.com/x-frame-bypass@1.0.2/x-frame-bypass.js" type="module"></script>
+
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            overflow: hidden;
         }
         html, body {
             width: 100%;
             height: 100%;
             background-color: #000;
+            overflow: hidden;
         }
-        iframe {
+        /* Custom iframe tag using the x-frame-bypass element */
+        iframe[is="x-frame-bypass"] {
             width: 100vw;
             height: 100vh;
             border: none;
@@ -24,7 +32,15 @@
         }
     </style>
 </head>
-body>
-    <iframe src="https://solve5.playgta5.net/?mode=sandbox" allowfullscreen></iframe>
+<body>
+
+    <!-- Notice the added is="x-frame-bypass" attribute -->
+    <iframe 
+        is="x-frame-bypass" 
+        src="https://solve5.playgta5.net/?mode=sandbox"
+        allow="autoplay; gamepad; fullscreen; keyboard; focus-without-user-activation; pointer-lock"
+        allowfullscreen>
+    </iframe>
+
 </body>
 </html>
