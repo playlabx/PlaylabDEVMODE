@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-950 text-slate-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="tabTitle">Google Drive</title>
+    <link id="tabFavicon" rel="icon" type="image/x-icon" href="https://ssl.gstatic.com/images/branding/product/1x/drive_2020q4_32dp.png">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <style>
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 9999px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+    </style>
+</head>
+<body class="h-full min-h-screen flex flex-col font-sans antialiased bg-slate-950 text-slate-100 selection:bg-indigo-500 selection:text-white">
+
+    <!-- Toast Notification Overlay -->
+    <div id="toastContainer" class="fixed top-4 right-4 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <!-- MAIN CONTAINER -->
+    <div class="max-w-4xl mx-auto w-full p-4 sm:p-6 my-auto">
+        
+        <!-- Header / Logo -->
+        <div class="text-center mb-8">
+            <div class="inline-flex items-center justify-center w-14 h-14 bg-indigo-600/20 border border-indigo-500/30 rounded-2xl mb-3 text-indigo-400 shadow-lg shadow-indigo-500/10">
+                <i data-lucide="shield-check" class="w-8 h-8"></i>
+            </div>
+            <h1 class="text-3xl font-bold tracking-tight text-white">Tab Disguiser & Launcher</h1>
+            <p class="text-slate-400 text-sm mt-1">Mask your browser tab, upload custom icons, or launch disguised tabs in seconds.</p>
+        </div>
+
+        <!-- 3-STEP GRID -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+            
+            <!-- STEP 1: PRESETS & DISGUISE -->
+            <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-xl flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="w-6 h-6 rounded-full bg-indigo-600 text-white font-bold text-xs flex items-center justify-center shrink-0">1</span>
+                        <h2 class="font-semibold text-lg text-slate-100">Choose Disguise</h2>
+                    </div>
+
+                    <!-- Quick Presets -->
+                    <label class="block text-xs font-medium text-slate-400 mb-2">Quick Presets</label>
+                    <div class="grid grid-cols-1 gap-2 mb-4">
+                        <button type="button" onclick="applyPreset('drive')" class="flex items-center gap-2.5 p-2.5 rounded-xl bg-slate-950/60 border border-slate-800 hover:border-indigo-500/50 hover:bg-slate-800/80 transition text-left text-xs font-medium">
+                            <img src="https://ssl.gstatic.com/images/branding/product/1x/drive_2020q4_32dp.png" class="w-4 h-4 rounded object-contain shrink-0" alt="Drive">
+                            <span class="truncate">Google Drive</span>
+                        </button>
+                        <button type="button" onclick="applyPreset('docs')" class="flex items-center gap-2.5 p-2.5 rounded-xl bg-slate-950/60 border border-slate-800 hover:border-indigo-500/50 hover:bg-slate-800/80 transition text-left text-xs font-medium">
+                            <img src="https://ssl.gstatic.com/docs/documents/images/kix-favicon7.ico" class="w-4 h-4 rounded object-contain shrink-0" alt="Docs">
+                            <span class="truncate">Google Docs</span>
+                        </button>
+                        <button type="button" onclick="applyPreset('canvas')" class="flex items-center gap-2.5 p-2.5 rounded-xl bg-slate-950/60 border border-slate-800 hover:border-indigo-500/50 hover:bg-slate-800/80 transition text-left text-xs font-medium">
+                            <img src="https://du11hjcvx0uqb.cloudfront.net/dist/images/favicon-e10d657a73.ico" class="w-4 h-4 rounded object-contain shrink-0" alt="Canvas">
+                            <span class="truncate">Canvas LMS</span>
+                        </button>
+                        <button type="button" onclick="applyPreset('classroom')" class="flex items-center gap-2.5 p-2.5 rounded-xl bg-slate-950/60 border border-slate-800 hover:border-indigo-500/50 hover:bg-slate-800/80 transition text-left text-xs font-medium">
+                            <img src="https://ssl.gstatic.com/classroom/favicon.png" class="w-4 h-4 rounded object-contain shrink-0" alt="Classroom">
+                            <span class="truncate">Google Classroom</span>
+                        </button>
+                        <button type="button" onclick="applyPreset('wikipedia')" class="flex items-center gap-2.5 p-2.5 rounded-xl bg-slate-950/60 border border-slate-800 hover:border-indigo-500/50 hover:bg-slate-800/80 transition text-left text-xs font-medium">
+                            <img src="https://en.wikipedia.org/static/favicon/wikipedia.ico" class="w-4 h-4 rounded object-contain shrink-0" alt="Wikipedia">
+                            <span class="truncate">Wikipedia</span>
+                        </button>
+                    </div>
+                </div>
+
+                <button id="applyCurrentBtn" class="w-full py-2.5 px-3 bg-slate-800 hover:bg-indigo-600 text-white rounded-xl font-medium text-xs border border-slate-700 hover:border-indigo-500 transition flex items-center justify-center gap-2 shadow">
+                    <i data-lucide="sparkles" class="w-4 h-4"></i>
+                    <span>Apply Disguise To This Tab</span>
+                </button>
+            </div>
+
+            <!-- STEP 2: CUSTOM DETAILS & FILE UPLOAD -->
+            <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-xl flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="w-6 h-6 rounded-full bg-indigo-600 text-white font-bold text-xs flex items-center justify-center shrink-0">2</span>
+                        <h2 class="font-semibold text-lg text-slate-100">Customize Icon & Title</h2>
+                    </div>
+
+                    <!-- Custom Tab Title -->
+                    <div class="mb-4">
+                        <label class="block text-xs font-medium text-slate-400 mb-1">Tab Title</label>
+                        <input type="text" id="titleInput" placeholder="e.g., Google Drive" 
+                            class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-indigo-500 transition text-slate-100 placeholder-slate-600">
+                    </div>
+
+                    <!-- Custom Icon URL -->
+                    <div class="mb-4">
+                        <label class="block text-xs font-medium text-slate-400 mb-1">Icon URL</label>
+                        <input type="url" id="iconUrlInput" placeholder="https://example.com/favicon.ico" 
+                            class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-indigo-500 transition text-slate-100 placeholder-slate-600">
+                    </div>
+
+                    <!-- Local File Upload -->
+                    <div class="mb-4">
+                        <label class="block text-xs font-medium text-slate-400 mb-1">OR Upload Image File</label>
+                        <label for="iconFileInput" class="flex items-center justify-center gap-2 w-full py-2 px-3 bg-slate-950 border border-dashed border-slate-700 hover:border-indigo-500 rounded-xl cursor-pointer text-xs text-slate-400 hover:text-indigo-400 transition">
+                            <i data-lucide="upload" class="w-4 h-4"></i>
+                            <span id="fileLabel">Choose Image File...</span>
+                        </label>
+                        <input type="file" id="iconFileInput" accept="image/*" class="hidden">
+                    </div>
+                </div>
+
+                <!-- Live Preview Box -->
+                <div class="p-3 bg-slate-950/80 border border-slate-800/80 rounded-xl flex items-center gap-3">
+                    <img id="iconPreview" src="https://ssl.gstatic.com/images/branding/product/1x/drive_2020q4_32dp.png" class="w-8 h-8 rounded object-contain border border-slate-800 p-0.5 bg-slate-900" alt="Preview">
+                    <div class="overflow-hidden">
+                        <div class="text-[10px] uppercase font-bold text-slate-500 tracking-wider">Live Preview</div>
+                        <div id="titlePreview" class="text-xs font-medium text-slate-200 truncate">Google Drive</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STEP 3: WEBSITE & LAUNCH OPTIONS -->
+            <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 shadow-xl flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center gap-2 mb-4">
+                        <span class="w-6 h-6 rounded-full bg-indigo-600 text-white font-bold text-xs flex items-center justify-center shrink-0">3</span>
+                        <h2 class="font-semibold text-lg text-slate-100">Launch Target Site</h2>
+                    </div>
+
+                    <!-- Target URL -->
+                    <div class="mb-5">
+                        <label class="block text-xs font-medium text-slate-400 mb-1">Website URL to Open</label>
+                        <div class="relative">
+                            <i data-lucide="link-2" class="w-4 h-4 absolute left-3 top-2.5 text-slate-500"></i>
+                            <input type="url" id="targetUrlInput" placeholder="https://example.com" value="https://wikipedia.org"
+                                class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3 py-2 text-sm focus:outline-none focus:border-indigo-500 transition text-slate-100 placeholder-slate-600">
+                        </div>
+                    </div>
+
+                    <!-- Embedded Frame View Button -->
+                    <button id="loadInFrameBtn" class="w-full mb-3 py-2.5 px-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-medium text-xs shadow transition flex items-center justify-center gap-2">
+                        <i data-lucide="play" class="w-4 h-4"></i>
+                        <span>Load Here (In Page Viewer)</span>
+                    </button>
+
+                    <!-- NEW FEATURE: Direct Cloaked Tab -->
+                    <button id="openDirectTabBtn" class="w-full mb-3 py-2.5 px-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl font-medium text-xs shadow transition flex items-center justify-center gap-2">
+                        <i data-lucide="external-link" class="w-4 h-4"></i>
+                        <span>Open Direct Cloaked Tab</span>
+                    </button>
+
+                    <!-- Stealth about:blank Tab -->
+                    <button id="openStealthBtn" class="w-full py-2.5 px-3 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-xl font-medium text-xs transition flex items-center justify-center gap-2">
+                        <i data-lucide="ghost" class="w-4 h-4 text-indigo-400"></i>
+                        <span>Open Stealth (about:blank)</span>
+                    </button>
+                </div>
+
+                <div class="mt-4 pt-3 border-t border-slate-800/80 text-[11px] text-slate-500 text-center">
+                    Esc key toggles control header when embedding sites.
+                </div>
+            </div>
+
+        </div>
+
+        <!-- EMBEDDED IFRAME VIEWER CONTAINER (Hidden by default) -->
+        <div id="frameViewerContainer" class="hidden fixed inset-0 z-40 bg-slate-950 flex flex-col">
+            <!-- Top Bar inside Viewer -->
+            <div id="viewerHeader" class="bg-slate-900 border-b border-slate-800 px-4 py-2 flex items-center justify-between z-50 shrink-0">
+                <div class="flex items-center gap-2">
+                    <img id="activeViewerIcon" src="" class="w-4 h-4 rounded object-contain">
+                    <span id="activeViewerTitle" class="text-xs font-semibold text-slate-200 truncate max-w-xs"></span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button id="closeViewerBtn" class="px-3 py-1 bg-red-600/20 hover:bg-red-600/30 text-red-300 border border-red-500/30 rounded-lg text-xs font-medium transition flex items-center gap-1">
+                        <i data-lucide="x" class="w-3.5 h-3.5"></i> Close Frame
+                    </button>
+                </div>
+            </div>
+            <iframe id="embeddedIframe" class="w-full h-full border-0 flex-1" allow="fullscreen; autoplay; clipboard-write; encrypted-media; picture-in-picture"></iframe>
+        </div>
+
+    </div>
+
+    <!-- LOGIC SCRIPT -->
+    <script>
+        // Preset Definitions
+        const PRESETS = {
+            drive: {
+                title: "My Drive - Google Drive",
+                icon: "https://ssl.gstatic.com/images/branding/product/1x/drive_2020q4_32dp.png"
+            },
+            docs: {
+                title: "Google Docs",
+                icon: "https://ssl.gstatic.com/docs/documents/images/kix-favicon7.ico"
+            },
+            canvas: {
+                title: "Dashboard",
+                icon: "https://du11hjcvx0uqb.cloudfront.net/dist/images/favicon-e10d657a73.ico"
+            },
+            classroom: {
+                title: "Classes",
+                icon: "https://ssl.gstatic.com/classroom/favicon.png"
+            },
+            wikipedia: {
+                title: "Wikipedia, the free encyclopedia",
+                icon: "https://en.wikipedia.org/static/favicon/wikipedia.ico"
+            }
+        };
+
+        // DOM Elements
+        const titleInput = document.getElementById('titleInput');
+        const iconUrlInput = document.getElementById('iconUrlInput');
+        const iconFileInput = document.getElementById('iconFileInput');
+        const fileLabel = document.getElementById('fileLabel');
+        const targetUrlInput = document.getElementById('targetUrlInput');
+        
+        const iconPreview = document.getElementById('iconPreview');
+        const titlePreview = document.getElementById('titlePreview');
+        const tabTitle = document.getElementById('tabTitle');
+        const tabFavicon = document.getElementById('tabFavicon');
+        
+        const applyCurrentBtn = document.getElementById('applyCurrentBtn');
+        const loadInFrameBtn = document.getElementById('loadInFrameBtn');
+        const openDirectTabBtn = document.getElementById('openDirectTabBtn');
+        const openStealthBtn = document.getElementById('openStealthBtn');
+
+        const frameViewerContainer = document.getElementById('frameViewerContainer');
+        const embeddedIframe = document.getElementById('embeddedIframe');
+        const activeViewerIcon = document.getElementById('activeViewerIcon');
+        const activeViewerTitle = document.getElementById('activeViewerTitle');
+        const closeViewerBtn = document.getElementById('closeViewerBtn');
+
+        // Current Active Disguise State
+        let activeTitle = PRESETS.drive.title;
+        let activeIcon = PRESETS.drive.icon;
+
+        lucide.createIcons();
+
+        // Toast Alert System
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `px-4 py-2.5 rounded-xl text-xs font-medium text-white shadow-xl backdrop-blur border flex items-center gap-2 transform transition-all duration-300 translate-y-2 opacity-0 pointer-events-auto ${
+                type === 'success' ? 'bg-emerald-950/90 border-emerald-500/40 text-emerald-200' : 'bg-indigo-950/90 border-indigo-500/40 text-indigo-200'
+            }`;
+            toast.innerHTML = `<i data-lucide="${type === 'success' ? 'check-circle' : 'info'}" class="w-4 h-4 shrink-0"></i><span>${message}</span>`;
+            container.appendChild(toast);
+            lucide.createIcons();
+
+            requestAnimationFrame(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            });
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Update Live Preview & Active State
+        function updateDisguiseState(title, icon) {
+            if (title) {
+                activeTitle = title;
+                titleInput.value = title;
+                titlePreview.textContent = title;
+            }
+            if (icon) {
+                activeIcon = icon;
+                iconUrlInput.value = icon.startsWith('data:') ? '' : icon;
+                iconPreview.src = icon;
+            }
+        }
+
+        // Apply Disguise to Current Page
+        function applyToCurrentTab() {
+            tabTitle.textContent = activeTitle;
+            tabFavicon.href = activeIcon;
+            document.title = activeTitle;
+            showToast('Current tab disguised successfully!', 'success');
+        }
+
+        // Apply Preset Click Handler
+        function applyPreset(key) {
+            if (PRESETS[key]) {
+                updateDisguiseState(PRESETS[key].title, PRESETS[key].icon);
+                fileLabel.textContent = "Choose Image File...";
+                iconFileInput.value = "";
+                showToast(`Loaded ${PRESETS[key].title} preset`);
+            }
+        }
+
+        // Input Listeners
+        titleInput.addEventListener('input', (e) => {
+            const val = e.target.value.trim() || 'Home';
+            activeTitle = val;
+            titlePreview.textContent = val;
+        });
+
+        iconUrlInput.addEventListener('input', (e) => {
+            const val = e.target.value.trim();
+            if (val) {
+                activeIcon = val;
+                iconPreview.src = val;
+                fileLabel.textContent = "Choose Image File...";
+                iconFileInput.value = "";
+            }
+        });
+
+        // Local Image File Upload Handler (Converts File -> Base64 Data URI)
+        iconFileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                if (!file.type.startsWith('image/')) {
+                    showToast('Please select a valid image file!', 'error');
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = function(evt) {
+                    const base64Image = evt.target.result;
+                    activeIcon = base64Image;
+                    iconPreview.src = base64Image;
+                    iconUrlInput.value = '';
+                    fileLabel.textContent = file.name;
+                    showToast('Custom image file loaded!');
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Format URL with https:// if missing
+        function getFormattedUrl(url) {
+            let formatted = url.trim();
+            if (!formatted) return 'https://wikipedia.org';
+            if (!/^https?:\/\//i.test(formatted)) {
+                formatted = 'https://' + formatted;
+            }
+            return formatted;
+        }
+
+        // 1. Load Site In-Page Iframe
+        loadInFrameBtn.addEventListener('click', () => {
+            const targetUrl = getFormattedUrl(targetUrlInput.value);
+            applyToCurrentTab();
+            activeViewerTitle.textContent = activeTitle;
+            activeViewerIcon.src = activeIcon;
+            embeddedIframe.src = targetUrl;
+            frameViewerContainer.classList.remove('hidden');
+        });
+
+        closeViewerBtn.addEventListener('click', () => {
+            frameViewerContainer.classList.add('hidden');
+            embeddedIframe.src = '';
+        });
+
+        // 2. NEW FEATURE: Open Direct Cloaked Tab
+        openDirectTabBtn.addEventListener('click', () => {
+            const targetUrl = getFormattedUrl(targetUrlInput.value);
+            const win = window.open('about:blank', '_blank');
+            
+            if (!win) {
+                showToast('Pop-up blocked! Allow pop-ups to open tabs.', 'error');
+                return;
+            }
+
+            const doc = win.document;
+            doc.open();
+            doc.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>${activeTitle}</title>
+                    <link rel="icon" type="image/x-icon" href="${activeIcon}">
+                    <style>
+                        html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; }
+                        iframe { border: none; width: 100%; height: 100%; }
+                    </style>
+                </head>
+                <body>
+                    <iframe src="${targetUrl}" allow="fullscreen; autoplay; clipboard-write; encrypted-media; picture-in-picture"></iframe>
+                </body>
+                </html>
+            `);
+            doc.close();
+            showToast('Direct cloaked tab launched!', 'success');
+        });
+
+        // 3. Open Stealth Tab (about:blank)
+        openStealthBtn.addEventListener('click', () => {
+            const targetUrl = getFormattedUrl(targetUrlInput.value);
+            const win = window.open('about:blank', '_blank');
+            if (!win) {
+                showToast('Pop-up blocked! Allow pop-ups for stealth mode.', 'error');
+                return;
+            }
+            const doc = win.document;
+            doc.open();
+            doc.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>${activeTitle}</title>
+                    <link rel="icon" type="image/x-icon" href="${activeIcon}">
+                    <style>
+                        html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; }
+                        iframe { border: none; width: 100%; height: 100%; }
+                    </style>
+                </head>
+                <body>
+                    <iframe src="${targetUrl}" allow="fullscreen; autoplay; clipboard-write; encrypted-media; picture-in-picture"></iframe>
+                </body>
+                </html>
+            `);
+            doc.close();
+            showToast('Stealth window opened!', 'success');
+        });
+
+        applyCurrentBtn.addEventListener('click', applyToCurrentTab);
+
+        // Initial default setup
+        applyPreset('drive');
+    </script>
+</body>
+</html>
