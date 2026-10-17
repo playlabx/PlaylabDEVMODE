@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Game Links</title>
+  <style>
+    :root {
+      --bg-color: #0f172a;
+      --card-bg: #1e293b;
+      --text-main: #f8fafc;
+      --text-muted: #64748b;
+      --accent-color: #3b82f6;
+      --accent-hover: #2563eb;
+      --blocked-bg: #334155;
+      --blocked-text: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 2rem 1rem;
+    }
+
+    header {
+      margin-bottom: 2.5rem;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(135deg, #60a5fa, #a855f7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    p {
+      color: var(--text-muted);
+      font-size: 1rem;
+    }
+
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      width: 100%;
+      max-width: 900px;
+    }
+
+    .card {
+      background-color: var(--card-bg);
+      border-radius: 12px;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      min-height: 160px;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+    }
+
+    .card-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+
+    .btn {
+      display: inline-block;
+      text-decoration: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-weight: 600;
+      transition: background-color 0.2s ease;
+      width: 100%;
+    }
+
+    .btn-active {
+      background-color: var(--accent-color);
+      color: #ffffff;
+    }
+
+    .btn-active:hover {
+      background-color: var(--accent-hover);
+    }
+
+    .card-blocked {
+      background-color: var(--blocked-bg);
+      opacity: 0.7;
+    }
+
+    .card-blocked:hover {
+      transform: none;
+      box-shadow: none;
+    }
+
+    .btn-blocked {
+      background-color: #475569;
+      color: var(--blocked-text);
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    .badge {
+      display: inline-block;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      margin-bottom: 0.5rem;
+    }
+
+    .badge-available {
+      background-color: rgba(59, 130, 246, 0.2);
+      color: #60a5fa;
+    }
+
+    .badge-blocked {
+      background-color: rgba(239, 68, 68, 0.2);
+      color: #f87171;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Game Portal</h1>
+    <p>Select a game to start playing</p>
+  </header>
+
+  <main class="grid-container">
+    <!-- Active Game Site -->
+    <div class="card">
+      <span class="badge badge-available">Available</span>
+      <h2 class="card-title">Play GTA 5</h2>
+      <a href="https://playgta5.net/" target="_blank" rel="noopener noreferrer" class="btn btn-active">Play Now</a>
+    </div>
+
+    <!-- Blocked Sites -->
+    <div class="card card-blocked">
+      <span class="badge badge-blocked">Blocked</span>
+      <h2 class="card-title">Game Site 2</h2>
+      <a href="#" class="btn btn-blocked" tabindex="-1">Blocked</a>
+    </div>
+
+    <div class="card card-blocked">
+      <span class="badge badge-blocked">Blocked</span>
+      <h2 class="card-title">Game Site 3</h2>
+      <a href="#" class="btn btn-blocked" tabindex="-1">Blocked</a>
+    </div>
+
+    <div class="card card-blocked">
+      <span class="badge badge-blocked">Blocked</span>
+      <h2 class="card-title">Game Site 4</h2>
+      <a href="#" class="btn btn-blocked" tabindex="-1">Blocked</a>
+    </div>
+
+    <div class="card card-blocked">
+      <span class="badge badge-blocked">Blocked</span>
+      <h2 class="card-title">Game Site 5</h2>
+      <a href="#" class="btn btn-blocked" tabindex="-1">Blocked</a>
+    </div>
+
+    <div class="card card-blocked">
+      <span class="badge badge-blocked">Blocked</span>
+      <h2 class="card-title">Game Site 6</h2>
+      <a href="#" class="btn btn-blocked" tabindex="-1">Blocked</a>
+    </div>
+  </main>
+
+</body>
+</html>
