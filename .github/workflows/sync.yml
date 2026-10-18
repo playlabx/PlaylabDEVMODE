@@ -14,11 +14,11 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Push to playlaab
+      - name: Push to playlab
         env:
           SYNC_TOKEN: ${{ secrets.AUTO_SYNC_TOKEN }}
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
-          git remote add target https://x-access-token:${SYNC_TOKEN}@github.com/vrstheft/playlaab.git
+          git remote add target https://x-access-token:${SYNC_TOKEN}@github.com/vrstheft/playlab.git
           git push target main --force
