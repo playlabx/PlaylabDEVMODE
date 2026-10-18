@@ -3,20 +3,22 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gaxerly Hub - Modern HTML5 Arcade</title>
+  <title>Gaxerly Cyber Arcade & Engine Hub</title>
+  <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-dark: #0a0b10;
-      --panel-bg: rgba(18, 20, 29, 0.75);
-      --panel-border: rgba(0, 240, 255, 0.15);
+      --bg-dark: #08090d;
+      --panel-bg: rgba(15, 18, 28, 0.82);
+      --panel-border: rgba(0, 240, 255, 0.2);
       --accent-cyan: #00f0ff;
       --accent-magenta: #ff007f;
       --accent-purple: #7000ff;
+      --accent-green: #00ff88;
       --text-main: #e2e8f0;
       --text-muted: #8a99ad;
-      --glow-cyan: 0 0 15px rgba(0, 240, 255, 0.4);
-      --glow-magenta: 0 0 15px rgba(ff, 0, 127, 0.4);
+      --glow-cyan: 0 0 15px rgba(0, 240, 255, 0.35);
+      --glow-magenta: 0 0 15px rgba(255, 0, 127, 0.35);
     }
 
     * {
@@ -26,7 +28,7 @@
       user-select: none;
     }
 
-    /* --- Custom Gaxerly Cursor --- */
+    /* Custom Gaxerly Neon Cursors */
     body {
       background-color: var(--bg-dark);
       color: var(--text-main);
@@ -34,14 +36,14 @@
       min-height: 100vh;
       display: flex;
       overflow: hidden;
-      cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="%2300f0ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 3 10 21 12 14 19 12 3 3"/><line x1="12" y1="14" x2="21" y2="21"/></svg>'), auto;
+      cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="%2300f0ff" stroke-width="2"><circle cx="12" cy="12" r="6"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/></svg>') 12 12, auto;
     }
 
-    a, button, input, .clickable {
-      cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="%23ff007f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 3 10 21 12 14 19 12 3 3"/><line x1="12" y1="14" x2="21" y2="21"/></svg>'), pointer !important;
+    a, button, input, select, .clickable {
+      cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="%23ff007f" stroke-width="2.5"><polygon points="3 3 10 21 12 14 19 12 3 3"/><line x1="12" y1="14" x2="21" y2="21"/></svg>') 4 4, pointer !important;
     }
 
-    /* Ambient Dynamic Background Particles & Grid */
+    /* Ambient Dynamic Background Canvas */
     #canvas-bg {
       position: fixed;
       top: 0;
@@ -52,7 +54,7 @@
       pointer-events: none;
     }
 
-    /* App Layout */
+    /* App Structure */
     .app-container {
       display: flex;
       width: 100vw;
@@ -61,14 +63,15 @@
 
     /* Sidebar Navigation */
     .sidebar {
-      width: 250px;
+      width: 260px;
       background: var(--panel-bg);
-      backdrop-filter: blur(12px);
+      backdrop-filter: blur(16px);
       border-right: 1px solid var(--panel-border);
       display: flex;
       flex-direction: column;
       padding: 24px 16px;
       z-index: 10;
+      flex-shrink: 0;
     }
 
     .brand {
@@ -80,8 +83,8 @@
     }
 
     .brand-logo {
-      width: 36px;
-      height: 36px;
+      width: 38px;
+      height: 38px;
       background: linear-gradient(135deg, var(--accent-cyan), var(--accent-magenta));
       clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
       box-shadow: var(--glow-cyan);
@@ -89,7 +92,7 @@
 
     .brand-title {
       font-family: 'Orbitron', sans-serif;
-      font-size: 1.3rem;
+      font-size: 1.4rem;
       font-weight: 900;
       letter-spacing: 2px;
       background: linear-gradient(90deg, var(--accent-cyan), #ffffff);
@@ -101,7 +104,7 @@
       list-style: none;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 10px;
     }
 
     .nav-btn {
@@ -114,7 +117,7 @@
       border: 1px solid transparent;
       color: var(--text-muted);
       font-family: 'Orbitron', sans-serif;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       font-weight: 700;
       letter-spacing: 1px;
       transition: all 0.25s ease;
@@ -132,7 +135,7 @@
     .nav-btn:hover {
       color: #fff;
       background: rgba(0, 240, 255, 0.08);
-      border-color: rgba(0, 240, 255, 0.2);
+      border-color: rgba(0, 240, 255, 0.25);
     }
 
     .nav-btn:hover svg {
@@ -150,10 +153,10 @@
       stroke: var(--accent-cyan);
     }
 
-    /* Chill Music & Sound Control Box */
+    /* Audio Controller */
     .audio-controls {
       margin-top: auto;
-      background: rgba(10, 11, 16, 0.6);
+      background: rgba(8, 10, 16, 0.75);
       border: 1px solid var(--panel-border);
       padding: 14px;
       border-radius: 12px;
@@ -194,12 +197,12 @@
       background: rgba(0, 240, 255, 0.1);
     }
 
-    /* Main Content Area */
+    /* Main Content */
     .content-area {
       flex: 1;
       display: flex;
       flex-direction: column;
-      padding: 24px;
+      padding: 28px;
       overflow-y: auto;
       position: relative;
     }
@@ -218,7 +221,7 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Header / Search Controls */
+    /* Header & Filters */
     .section-header {
       margin-bottom: 24px;
     }
@@ -228,7 +231,7 @@
       font-size: 1.8rem;
       font-weight: 900;
       color: #fff;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
       display: flex;
       align-items: center;
       gap: 12px;
@@ -236,21 +239,28 @@
 
     .section-subtitle {
       color: var(--text-muted);
-      font-size: 1rem;
+      font-size: 0.95rem;
+    }
+
+    .controls-row {
+      display: flex;
+      gap: 14px;
+      margin-top: 18px;
+      flex-wrap: wrap;
     }
 
     .search-bar {
-      margin-top: 16px;
       position: relative;
-      max-width: 500px;
+      flex: 1;
+      min-width: 260px;
     }
 
     .search-input {
       width: 100%;
-      padding: 14px 20px 14px 48px;
+      padding: 12px 18px 12px 44px;
       background: var(--panel-bg);
       border: 1px solid var(--panel-border);
-      border-radius: 10px;
+      border-radius: 8px;
       color: #fff;
       font-family: 'Rajdhani', sans-serif;
       font-size: 1rem;
@@ -265,18 +275,30 @@
 
     .search-icon {
       position: absolute;
-      left: 16px;
+      left: 14px;
       top: 50%;
       transform: translateY(-50%);
       stroke: var(--text-muted);
-      width: 20px;
-      height: 20px;
+      width: 18px;
+      height: 18px;
+    }
+
+    .filter-select {
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      color: var(--text-main);
+      padding: 0 16px;
+      border-radius: 8px;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      outline: none;
     }
 
     /* Cards Grid */
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
       gap: 20px;
     }
 
@@ -307,12 +329,47 @@
 
     .card:hover {
       transform: translateY(-4px);
-      border-color: rgba(0, 240, 255, 0.4);
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5), var(--glow-cyan);
+      border-color: rgba(0, 240, 255, 0.45);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.6), var(--glow-cyan);
     }
 
     .card:hover::before {
       opacity: 1;
+    }
+
+    .badge-container {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .badge-builtin {
+      background: rgba(0, 255, 136, 0.15);
+      color: var(--accent-green);
+      border: 1px solid rgba(0, 255, 136, 0.3);
+    }
+
+    .badge-github {
+      background: rgba(0, 240, 255, 0.15);
+      color: var(--accent-cyan);
+      border: 1px solid rgba(0, 240, 255, 0.3);
+    }
+
+    .badge-gdoc {
+      background: rgba(255, 0, 127, 0.15);
+      color: var(--accent-magenta);
+      border: 1px solid rgba(255, 0, 127, 0.3);
     }
 
     .card-title {
@@ -320,13 +377,16 @@
       font-size: 1.1rem;
       color: #fff;
       margin-bottom: 8px;
+      word-break: break-word;
     }
 
     .card-desc {
       color: var(--text-muted);
-      font-size: 0.9rem;
-      margin-bottom: 16px;
+      font-size: 0.88rem;
+      margin-bottom: 18px;
       line-height: 1.4;
+      flex: 1;
+      word-break: break-all;
     }
 
     .card-actions {
@@ -336,11 +396,11 @@
 
     .btn {
       flex: 1;
-      padding: 10px 14px;
+      padding: 10px 12px;
       border-radius: 6px;
       border: none;
       font-family: 'Orbitron', sans-serif;
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       font-weight: 700;
       letter-spacing: 0.5px;
       transition: all 0.2s;
@@ -351,17 +411,17 @@
     }
 
     .btn-primary {
-      background: linear-gradient(135deg, var(--accent-cyan), #0099ff);
+      background: linear-gradient(135deg, var(--accent-cyan), #0088ff);
       color: #000;
     }
 
     .btn-primary:hover {
       box-shadow: var(--glow-cyan);
-      filter: brightness(1.1);
+      filter: brightness(1.15);
     }
 
     .btn-secondary {
-      background: rgba(255, 255, 255, 0.05);
+      background: rgba(255, 255, 255, 0.04);
       border: 1px solid var(--panel-border);
       color: var(--text-main);
     }
@@ -372,7 +432,50 @@
       color: var(--accent-magenta);
     }
 
-    /* Sources Section Forms */
+    .btn-magenta {
+      background: linear-gradient(135deg, var(--accent-magenta), var(--accent-purple));
+      color: #fff;
+    }
+
+    .btn-magenta:hover {
+      box-shadow: var(--glow-magenta);
+      filter: brightness(1.15);
+    }
+
+    /* Status Indicator Bar */
+    .status-banner {
+      background: rgba(0, 240, 255, 0.1);
+      border: 1px solid var(--accent-cyan);
+      border-radius: 8px;
+      padding: 12px 18px;
+      margin-bottom: 20px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.85rem;
+      color: var(--accent-cyan);
+      display: none;
+      align-items: center;
+      gap: 12px;
+      box-shadow: var(--glow-cyan);
+    }
+
+    .status-banner.active {
+      display: flex;
+    }
+
+    .spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid var(--accent-cyan);
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Sources Cards & Upload Dropzone */
     .source-box {
       background: var(--panel-bg);
       border: 1px solid var(--panel-border);
@@ -383,14 +486,14 @@
 
     .form-group {
       display: flex;
-      gap: 12px;
+      gap: 10px;
       margin-top: 12px;
     }
 
     .form-input {
       flex: 1;
       padding: 12px 16px;
-      background: rgba(10, 11, 16, 0.8);
+      background: rgba(8, 10, 16, 0.8);
       border: 1px solid var(--panel-border);
       border-radius: 8px;
       color: #fff;
@@ -403,16 +506,74 @@
       border-color: var(--accent-cyan);
     }
 
-    /* Modal / Fullscreen Game Player Overlay */
+    .dropzone {
+      border: 2px dashed var(--panel-border);
+      border-radius: 12px;
+      padding: 26px;
+      text-align: center;
+      background: rgba(0, 0, 0, 0.2);
+      transition: all 0.3s;
+      margin-top: 14px;
+    }
+
+    .dropzone.dragover {
+      border-color: var(--accent-cyan);
+      background: rgba(0, 240, 255, 0.08);
+      box-shadow: var(--glow-cyan);
+    }
+
+    /* Modal Download Options */
+    .download-modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(8px);
+      z-index: 2000;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .download-modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-box {
+      background: var(--panel-bg);
+      border: 1px solid var(--accent-cyan);
+      box-shadow: var(--glow-cyan);
+      border-radius: 14px;
+      padding: 28px;
+      max-width: 440px;
+      width: 90%;
+      text-align: center;
+    }
+
+    .modal-box h3 {
+      font-family: 'Orbitron', sans-serif;
+      color: #fff;
+      margin-bottom: 12px;
+    }
+
+    .modal-box p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      margin-bottom: 24px;
+    }
+
+    .modal-options {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    /* Game Runner Modal */
     .game-modal {
       display: none;
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(5, 6, 10, 0.95);
-      backdrop-filter: blur(10px);
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(4, 5, 8, 0.96);
+      backdrop-filter: blur(12px);
       z-index: 1000;
       flex-direction: column;
     }
@@ -432,23 +593,13 @@
 
     .game-modal-title {
       font-family: 'Orbitron', sans-serif;
-      font-size: 1.2rem;
+      font-size: 1.1rem;
       color: var(--accent-cyan);
     }
 
-    .game-modal-close {
-      background: rgba(255, 0, 127, 0.2);
-      border: 1px solid var(--accent-magenta);
-      color: #fff;
-      padding: 6px 16px;
-      border-radius: 6px;
-      font-family: 'Orbitron', sans-serif;
-      transition: all 0.2s;
-    }
-
-    .game-modal-close:hover {
-      background: var(--accent-magenta);
-      box-shadow: var(--glow-magenta);
+    .game-modal-controls {
+      display: flex;
+      gap: 10px;
     }
 
     .game-frame {
@@ -461,15 +612,16 @@
 
     .empty-state {
       text-align: center;
-      padding: 40px;
+      padding: 50px 20px;
       color: var(--text-muted);
       font-size: 1.1rem;
+      grid-column: 1 / -1;
     }
   </style>
 </head>
 <body>
 
-  <!-- Dynamic Canvas Background -->
+  <!-- Dynamic Cyber Canvas Background -->
   <canvas id="canvas-bg"></canvas>
 
   <div class="app-container">
@@ -496,12 +648,12 @@
         <li>
           <button class="nav-btn clickable" onclick="switchSection('library', this)">
             <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-            Library
+            Library (<span id="lib-count">0</span>)
           </button>
         </li>
       </ul>
 
-      <!-- Chill Music & SFX Controller -->
+      <!-- Chill Lo-Fi & SFX Controls -->
       <div class="audio-controls">
         <div class="audio-title">
           <span>CHILL AUDIO</span>
@@ -509,88 +661,124 @@
         </div>
         <div class="audio-btns">
           <button class="audio-btn clickable" onclick="toggleMusic()">Music 🎵</button>
-          <button class="audio-btn clickable" onclick="playBeep(600, 0.1)">SFX 🔊</button>
+          <button class="audio-btn clickable" onclick="playBeep(600, 0.08)">SFX 🔊</button>
         </div>
       </div>
     </aside>
 
-    <!-- Main Content Area -->
+    <!-- Content Area -->
     <main class="content-area">
       
+      <!-- Live Syncing Progress Status Banner -->
+      <div id="status-banner" class="status-banner">
+        <div class="spinner"></div>
+        <span id="status-text">Scanning external repository...</span>
+      </div>
+
       <!-- DASHBOARD SECTION -->
       <section id="dashboard" class="section active">
         <div class="section-header">
           <h1 class="section-title">Dashboard</h1>
-          <p class="section-subtitle">Search and launch games loaded from your connected sources.</p>
-          <div class="search-bar">
-            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <input type="text" id="game-search" class="search-input clickable" placeholder="Search games..." oninput="filterGames()">
+          <p class="section-subtitle">Discovered HTML5 games loaded from connected GitHub repos, Google Drive folders & Docs.</p>
+          
+          <div class="controls-row">
+            <div class="search-bar">
+              <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input type="text" id="game-search" class="search-input clickable" placeholder="Search games by name, file path, or source..." oninput="filterGames()">
+            </div>
+            <select id="source-filter" class="filter-select clickable" onchange="filterGames()">
+              <option value="ALL">All Sources</option>
+              <option value="GITHUB">GitHub Repos</option>
+              <option value="GDRIVE">Google Drive / Docs</option>
+              <option value="CUSTOM">Custom Web Sources</option>
+            </select>
           </div>
         </div>
 
-        <div id="dashboard-grid" class="grid">
-          <!-- Dynamically populated games -->
-        </div>
+        <div id="dashboard-grid" class="grid"></div>
       </section>
 
       <!-- SOURCES SECTION -->
       <section id="sources" class="section">
         <div class="section-header">
           <h1 class="section-title">Sources Manager</h1>
-          <p class="section-subtitle">Add sources like GitHub repositories, Google Docs, or custom web links to import games.</p>
+          <p class="section-subtitle">Deep-scan GitHub repositories, Google Drive shared folders/files, or Google Docs links to auto-discover all `.html` games.</p>
         </div>
 
-        <!-- Default Active Source -->
         <div class="source-box">
-          <h3 style="font-family:'Orbitron'; color: var(--accent-cyan); margin-bottom: 6px;">Default Active Source</h3>
-          <p style="color: var(--text-muted); font-size: 0.9rem;">Official playlabgames GitHub Source</p>
-          <div class="form-group">
-            <input type="text" class="form-input" value="https://vrstheft.github.io/playlabgames/" readonly>
-            <button class="btn btn-primary clickable" onclick="fetchSourceGames('https://vrstheft.github.io/playlabgames/')">Sync Source</button>
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+            <div>
+              <h3 style="font-family:'Orbitron'; color: var(--accent-cyan);">Default Source (PlayLabGames GitHub)</h3>
+              <p style="color: var(--text-muted); font-size: 0.9rem;">https://vrstheft.github.io/playlabgames/</p>
+            </div>
+            <button class="btn btn-primary clickable" style="flex:0 0 auto;" onclick="syncDefaultSource()">Deep Scan Source</button>
           </div>
         </div>
 
-        <!-- Add Custom Source -->
         <div class="source-box">
-          <h3 style="font-family:'Orbitron'; color: #fff; margin-bottom: 6px;">Add Custom Source Link</h3>
-          <p style="color: var(--text-muted); font-size: 0.9rem;">Supports GitHub links, Google Docs shared links, or raw web URLs.</p>
+          <h3 style="font-family:'Orbitron'; color: #fff; margin-bottom: 6px;">Add GitHub, Google Drive, or Google Docs Source</h3>
+          <p style="color: var(--text-muted); font-size: 0.9rem;">Paste any GitHub URL (`github.com/user/repo`), Google Drive folder/file link, or Google Doc containing game links.</p>
           <div class="form-group">
-            <input type="text" id="custom-source-url" class="form-input clickable" placeholder="https://github.com/user/repo or Google Doc Link...">
-            <button class="btn btn-secondary clickable" onclick="addCustomSource()">Add Source</button>
+            <input type="text" id="custom-source-url" class="form-input clickable" placeholder="e.g. https://github.com/user/repo or https://drive.google.com/drive/folders/...">
+            <button class="btn btn-magenta clickable" style="flex:0 0 auto;" onclick="addCustomSource()">Parse & Scan Source</button>
           </div>
         </div>
 
-        <div id="sources-list" class="grid" style="margin-top: 20px;">
-          <!-- Registered sources will show here -->
+        <!-- Import File Zone -->
+        <div class="source-box">
+          <h3 style="font-family:'Orbitron'; color: #fff; margin-bottom: 4px;">Direct Local HTML File Import</h3>
+          <p style="color: var(--text-muted); font-size: 0.9rem;">Drag and drop any HTML game file here to store it permanently inside your Gaxerly Library.</p>
+          <div class="dropzone clickable" id="file-dropzone" onclick="document.getElementById('file-input').click()">
+            <svg style="width:36px; height:36px; stroke: var(--accent-cyan); margin-bottom:8px;" viewBox="0 0 24 24" fill="none" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <p style="color:#fff; font-weight:600;">Drop .html file here or Click to Browse</p>
+            <input type="file" id="file-input" accept=".html,.htm" style="display:none" onchange="handleFileSelect(event)">
+          </div>
         </div>
+
+        <h3 style="font-family:'Orbitron'; color: #fff; margin: 20px 0 12px 0;">Connected Sources</h3>
+        <div id="sources-list" class="grid"></div>
       </section>
 
       <!-- LIBRARY SECTION -->
       <section id="library" class="section">
         <div class="section-header">
           <h1 class="section-title">My Library</h1>
-          <p class="section-subtitle">Games saved directly inside your browser storage for instant offline play.</p>
+          <p class="section-subtitle">Games saved permanently inside browser local storage for instant offline play anywhere.</p>
         </div>
 
-        <div id="library-grid" class="grid">
-          <!-- Downloaded/saved games will appear here -->
-        </div>
+        <div id="library-grid" class="grid"></div>
       </section>
 
     </main>
   </div>
 
-  <!-- Game Player Modal -->
+  <!-- Download Prompt Modal -->
+  <div id="download-modal" class="download-modal-overlay">
+    <div class="modal-box">
+      <h3 id="dl-modal-title">Save Game</h3>
+      <p>Choose how you want to download or save this HTML game:</p>
+      <div class="modal-options">
+        <button class="btn btn-primary clickable" onclick="confirmSaveToLibrary()">Save Inside HTML (Browser Library)</button>
+        <button class="btn btn-magenta clickable" onclick="confirmExportHtmlFile()">Download Standalone .HTML File</button>
+        <button class="btn btn-secondary clickable" onclick="closeDownloadModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fullscreen Game Modal -->
   <div id="game-modal" class="game-modal">
     <div class="game-modal-header">
-      <div id="modal-title" class="game-modal-title">Launching Game...</div>
-      <button class="game-modal-close clickable" onclick="closeGameModal()">Exit Game [X]</button>
+      <div id="modal-title" class="game-modal-title">GAXERLY RUNNER</div>
+      <div class="game-modal-controls">
+        <button class="btn btn-secondary clickable" onclick="toggleIframeFullscreen()">Fullscreen</button>
+        <button class="btn btn-magenta clickable" onclick="closeGameModal()">Exit Game [X]</button>
+      </div>
     </div>
-    <iframe id="game-iframe" class="game-frame" src="about:blank"></iframe>
+    <iframe id="game-iframe" class="game-frame" sandbox="allow-scripts allow-same-origin allow-modals allow-forms" src="about:blank"></iframe>
   </div>
 
   <script>
-    /* --- Ambient Canvas Background --- */
+    /* --- Dynamic Ambient Canvas Background --- */
     const canvas = document.getElementById('canvas-bg');
     const ctx = canvas.getContext('2d');
 
@@ -601,71 +789,57 @@
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
 
-    const particles = Array.from({ length: 45 }, () => ({
+    const particles = Array.from({ length: 50 }, () => ({
       x: Math.random() * canvas.width,
       y: Math.random() * canvas.height,
       radius: Math.random() * 2 + 1,
-      dx: (Math.random() - 0.5) * 0.5,
-      dy: (Math.random() - 0.5) * 0.5,
+      dx: (Math.random() - 0.5) * 0.4,
+      dy: (Math.random() - 0.5) * 0.4,
       color: Math.random() > 0.5 ? 'rgba(0, 240, 255, ' : 'rgba(255, 0, 127, '
     }));
 
     function animateBg() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      
-      // Cyber grid lines
       ctx.strokeStyle = 'rgba(0, 240, 255, 0.03)';
       ctx.lineWidth = 1;
       const step = 60;
       for (let x = 0; x < canvas.width; x += step) {
-        ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, canvas.height);
-        ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
       }
       for (let y = 0; y < canvas.height; y += step) {
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(canvas.width, y);
-        ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
       }
 
-      // Particles
       particles.forEach(p => {
-        p.x += p.dx;
-        p.y += p.dy;
+        p.x += p.dx; p.y += p.dy;
         if (p.x < 0 || p.x > canvas.width) p.dx *= -1;
         if (p.y < 0 || p.y > canvas.height) p.dy *= -1;
-
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
         ctx.fillStyle = p.color + '0.5)';
         ctx.fill();
       });
-
       requestAnimationFrame(animateBg);
     }
     animateBg();
 
-    /* --- Audio & Sound Effects Synthesizer --- */
+    /* --- Web Audio API Synth & Music --- */
     let audioCtx = null;
     let isMusicPlaying = false;
     let musicInterval = null;
 
     function initAudio() {
-      if (!audioCtx) {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      }
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     }
 
-    function playBeep(freq = 440, duration = 0.08, type = 'sine') {
+    function playBeep(freq = 500, duration = 0.08) {
       try {
         initAudio();
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
-        osc.type = type;
+        osc.type = 'sine';
         osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-        gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.06, audioCtx.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
         osc.connect(gain);
         gain.connect(audioCtx.destination);
@@ -674,7 +848,6 @@
       } catch (e) {}
     }
 
-    // Chill Lo-Fi Procedural Synthesizer
     function toggleMusic() {
       initAudio();
       const status = document.getElementById('music-status');
@@ -685,24 +858,19 @@
         status.style.color = "var(--text-muted)";
       } else {
         isMusicPlaying = true;
-        status.innerText = "PLAYING (CHILL)";
+        status.innerText = "PLAYING";
         status.style.color = "var(--accent-cyan)";
-        playChillNotes();
-        musicInterval = setInterval(playChillNotes, 3200);
+        playLoFiNotes();
+        musicInterval = setInterval(playLoFiNotes, 3200);
       }
     }
 
-    function playChillNotes() {
+    function playLoFiNotes() {
       if (!isMusicPlaying) return;
-      const chords = [
-        [261.63, 329.63, 392.00, 493.88], // Cmaj7
-        [220.00, 261.63, 329.63, 392.00], // Am7
-        [174.61, 220.00, 261.63, 329.63], // Fmaj7
-        [196.00, 246.94, 293.66, 349.23]  // G7
-      ];
-      const chord = chords[Math.floor(Math.random() * chords.length)];
+      const notes = [261.63, 329.63, 392.00, 493.88, 523.25];
+      const selected = [notes[Math.floor(Math.random() * notes.length)], notes[Math.floor(Math.random() * notes.length)]];
       
-      chord.forEach((freq, idx) => {
+      selected.forEach((freq, idx) => {
         setTimeout(() => {
           if (!isMusicPlaying) return;
           try {
@@ -710,25 +878,42 @@
             const gain = audioCtx.createGain();
             osc.type = 'triangle';
             osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-            gain.gain.setValueAtTime(0.03, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 2.5);
+            gain.gain.setValueAtTime(0.025, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 2.8);
             osc.connect(gain);
             gain.connect(audioCtx.destination);
             osc.start();
-            osc.stop(audioCtx.currentTime + 2.5);
+            osc.stop(audioCtx.currentTime + 2.8);
           } catch(e) {}
-        }, idx * 350);
+        }, idx * 400);
       });
     }
 
-    /* --- App Logic & State --- */
-    let availableGames = [
-      { id: '1', title: 'Cyber Snake', desc: 'Classic snake with modern neon aesthetics.', url: 'https://vrstheft.github.io/playlabgames/', code: `<!DOCTYPE html><html><body style="background:#0a0b10;color:#00f0ff;font-family:sans-serif;display:flex;justify-content:center;align-items:center;height:100vh;margin:0;"><h1>Cyber Snake - Loaded Offline</h1></body></html>` },
-      { id: '2', title: 'Retro Pong', desc: 'High-speed arcade pong battle.', url: 'https://vrstheft.github.io/playlabgames/', code: `<!DOCTYPE html><html><body style="background:#0a0b10;color:#ff007f;font-family:sans-serif;display:flex;justify-content:center;align-items:center;height:100vh;margin:0;"><h1>Retro Pong - Loaded Offline</h1></body></html>` }
+    /* --- App State --- */
+    let allGames = [];
+    let sourcesList = [
+      { id: 'src_default', name: 'PlayLabGames GitHub Repository', url: 'https://vrstheft.github.io/playlabgames/', status: 'Not Synced', gameCount: 0, type: 'GITHUB' }
     ];
+    let selectedGameForDownload = null;
 
-    let libraryGames = JSON.parse(localStorage.getItem('gaxerly_library') || '[]');
+    /* --- UI Helpers & Status Indicator --- */
+    function showStatus(text) {
+      const banner = document.getElementById('status-banner');
+      const textElem = document.getElementById('status-text');
+      textElem.innerText = text;
+      banner.classList.add('active');
+    }
 
+    function hideStatus() {
+      document.getElementById('status-banner').classList.remove('active');
+    }
+
+    function formatTitleFromPath(path) {
+      const fileName = path.split('/').pop().replace(/\.[^/.]+$/, "");
+      return fileName.replace(/[-_]/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+    }
+
+    /* --- Navigation & Section Toggle --- */
     function switchSection(sectionId, btn) {
       playBeep(520, 0.05);
       document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
@@ -737,30 +922,261 @@
       document.getElementById(sectionId).classList.add('active');
       if (btn) btn.classList.add('active');
 
-      if (sectionId === 'dashboard') renderDashboard();
       if (sectionId === 'library') renderLibrary();
+      if (sectionId === 'sources') renderSources();
     }
 
-    function renderDashboard(gamesToRender = availableGames) {
+    /* --- Deep Scanners --- */
+    // 1. GitHub API Recursive Tree Scanner
+    async function scanGitHubRepo(owner, repo, pagesBaseUrl = '') {
+      showStatus(`Scanning GitHub repo: ${owner}/${repo}...`);
+      let treeData = null;
+
+      try {
+        const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/git/trees/main?recursive=1`);
+        if (res.ok) {
+          treeData = await res.json();
+        } else {
+          const resMaster = await fetch(`https://api.github.com/repos/${owner}/${repo}/git/trees/master?recursive=1`);
+          if (resMaster.ok) treeData = await resMaster.json();
+        }
+      } catch (e) {}
+
+      if (!treeData || !treeData.tree) {
+        throw new Error(`Could not access repository tree for ${owner}/${repo}`);
+      }
+
+      const htmlFiles = treeData.tree.filter(item => item.type === 'blob' && /\.html?$/i.test(item.path));
+      showStatus(`Found ${htmlFiles.length} HTML games in repository! Processing...`);
+
+      const baseUrl = pagesBaseUrl || `https://${owner}.github.io/${repo}/`;
+      const gamesDiscovered = [];
+
+      htmlFiles.forEach((file, idx) => {
+        const cleanTitle = formatTitleFromPath(file.path);
+        const gameUrl = baseUrl + file.path;
+        const rawGithubUrl = `https://raw.githubusercontent.com/${owner}/${repo}/HEAD/${file.path}`;
+
+        gamesDiscovered.push({
+          id: `gh_${owner}_${repo}_${idx}_${Date.now()}`,
+          title: cleanTitle,
+          desc: `File: ${file.path}`,
+          sourceType: 'GITHUB',
+          tags: ['GitHub Repo', 'HTML5 Game'],
+          url: gameUrl,
+          rawUrl: rawGithubUrl
+        });
+      });
+
+      return gamesDiscovered;
+    }
+
+    // 2. Google Drive & Docs Parser Engine
+    async function parseGoogleSource(inputUrl) {
+      showStatus('Parsing Google Drive / Docs link...');
+      
+      const driveFolderMatch = inputUrl.match(/folders\/([a-zA-Z0-9_-]+)/);
+      const driveFileMatch = inputUrl.match(/file\/d\/([a-zA-Z0-9_-]+)/) || inputUrl.match(/id=([a-zA-Z0-9_-]+)/);
+      const docsMatch = inputUrl.match(/document\/d\/([a-zA-Z0-9_-]+)/);
+
+      const games = [];
+
+      if (driveFolderMatch) {
+        const folderId = driveFolderMatch[1];
+        showStatus('Scanning Google Drive Folder...');
+        games.push({
+          id: `gdrive_folder_${Date.now()}`,
+          title: 'Google Drive Folder Hub',
+          desc: `Drive Folder ID: ${folderId}`,
+          sourceType: 'GDRIVE',
+          tags: ['Google Drive', 'Folder Embed'],
+          url: `https://drive.google.com/embeddedfolderview?id=${folderId}#grid`
+        });
+      } else if (driveFileMatch) {
+        const fileId = driveFileMatch[1];
+        games.push({
+          id: `gdrive_file_${Date.now()}`,
+          title: 'Google Drive Game Document',
+          desc: `Drive File ID: ${fileId}`,
+          sourceType: 'GDRIVE',
+          tags: ['Google Drive', 'HTML Embed'],
+          url: `https://drive.google.com/uc?export=view&id=${fileId}`
+        });
+      } else if (docsMatch) {
+        const docId = docsMatch[1];
+        try {
+          const pubUrl = `https://docs.google.com/document/d/${docId}/pub`;
+          const res = await fetch(pubUrl);
+          const text = await res.text();
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(text, 'text/html');
+          
+          const links = Array.from(doc.querySelectorAll('a'))
+            .map(a => a.href)
+            .filter(h => h.includes('http'));
+
+          links.forEach((lnk, idx) => {
+            games.push({
+              id: `gdoc_link_${idx}_${Date.now()}`,
+              title: `Game Link ${idx + 1} from Doc`,
+              desc: lnk,
+              sourceType: 'GDRIVE',
+              tags: ['Google Doc Link'],
+              url: lnk
+            });
+          });
+        } catch (e) {
+          games.push({
+            id: `gdoc_embed_${Date.now()}`,
+            title: 'Google Doc Embedded Source',
+            desc: `Google Doc ID: ${docId}`,
+            sourceType: 'GDRIVE',
+            tags: ['Google Doc'],
+            url: `https://docs.google.com/document/d/${docId}/pub`
+          });
+        }
+      }
+
+      return games;
+    }
+
+    /* --- Sync Manager Trigger --- */
+    async function syncSourceByUrl(url) {
+      playBeep(650, 0.08);
+      let newGames = [];
+      let sourceName = url;
+
+      try {
+        if (url.includes('github.com') || url.includes('github.io')) {
+          let owner = '', repo = '';
+          
+          if (url.includes('github.io')) {
+            const parsed = new URL(url);
+            owner = parsed.hostname.split('.')[0];
+            repo = parsed.pathname.split('/').filter(Boolean)[0] || '';
+          } else if (url.includes('github.com')) {
+            const parts = url.replace('https://github.com/', '').split('/');
+            owner = parts[0];
+            repo = parts[1];
+          }
+
+          if (owner && repo) {
+            sourceName = `${owner}/${repo} (GitHub)`;
+            newGames = await scanGitHubRepo(owner, repo);
+          } else {
+            throw new Error('Invalid GitHub URL structure');
+          }
+        } else if (url.includes('drive.google.com') || url.includes('docs.google.com')) {
+          sourceName = 'Google Drive / Doc Source';
+          newGames = await parseGoogleSource(url);
+        } else {
+          showStatus('Fetching web page...');
+          const res = await fetch(url);
+          const htmlText = await res.text();
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(htmlText, 'text/html');
+          
+          const links = Array.from(doc.querySelectorAll('a'))
+            .map(a => a.getAttribute('href'))
+            .filter(h => h && h.endsWith('.html'))
+            .map(h => new URL(h, url).href);
+
+          const uniqueLinks = [...new Set(links)];
+          uniqueLinks.forEach((link, idx) => {
+            newGames.push({
+              id: `custom_link_${idx}_${Date.now()}`,
+              title: formatTitleFromPath(link),
+              desc: link,
+              sourceType: 'CUSTOM',
+              tags: ['Web Link'],
+              url: link
+            });
+          });
+        }
+
+        let addedCount = 0;
+        newGames.forEach(game => {
+          if (!allGames.some(g => g.url === game.url)) {
+            allGames.push(game);
+            addedCount++;
+          }
+        });
+
+        let existingSrc = sourcesList.find(s => s.url === url);
+        if (!existingSrc) {
+          existingSrc = {
+            id: 'src_' + Date.now(),
+            name: sourceName,
+            url: url,
+            status: 'Synced',
+            gameCount: addedCount,
+            type: url.includes('drive') || url.includes('docs') ? 'GDRIVE' : (url.includes('github') ? 'GITHUB' : 'CUSTOM')
+          };
+          sourcesList.push(existingSrc);
+        } else {
+          existingSrc.status = 'Synced';
+          existingSrc.gameCount = addedCount;
+        }
+
+        showStatus(`Success! Found ${addedCount} games from source.`);
+        setTimeout(hideStatus, 3000);
+
+        renderDashboard();
+        renderSources();
+
+      } catch (err) {
+        console.error(err);
+        showStatus(`Error syncing source: ${err.message}`);
+        setTimeout(hideStatus, 4000);
+      }
+    }
+
+    function syncDefaultSource() {
+      syncSourceByUrl('https://vrstheft.github.io/playlabgames/');
+    }
+
+    function addCustomSource() {
+      const input = document.getElementById('custom-source-url');
+      const url = input.value.trim();
+      if (!url) return;
+      syncSourceByUrl(url);
+      input.value = '';
+    }
+
+    /* --- Dashboard Rendering --- */
+    function renderDashboard(gamesToRender = allGames) {
       const grid = document.getElementById('dashboard-grid');
       grid.innerHTML = '';
 
       if (gamesToRender.length === 0) {
-        grid.innerHTML = `<div class="empty-state">No games found. Check your Sources or try another search query.</div>`;
+        grid.innerHTML = `
+          <div class="empty-state">
+            <p style="font-family:'Orbitron'; font-size:1.2rem; color:#fff; margin-bottom:10px;">No External Games Discovered Yet</p>
+            <p style="margin-bottom:20px;">Click <strong style="color:var(--accent-cyan)">"Deep Scan Source"</strong> in the Sources manager to scan GitHub repositories or Google Drive links for all .html files.</p>
+            <button class="btn btn-primary clickable" style="max-width:240px; margin:0 auto;" onclick="switchSection('sources', document.querySelectorAll('.nav-btn')[1])">Go to Sources Manager</button>
+          </div>`;
         return;
       }
 
       gamesToRender.forEach(game => {
         const card = document.createElement('div');
         card.className = 'card';
+
+        let badgeClass = 'badge-github';
+        if (game.sourceType === 'GDRIVE') badgeClass = 'badge-gdoc';
+        if (game.sourceType === 'CUSTOM') badgeClass = 'badge-builtin';
+
+        let badgesHtml = (game.tags || []).map(t => `<span class="badge ${badgeClass}">${t}</span>`).join('');
+
         card.innerHTML = `
           <div>
+            <div class="badge-container">${badgesHtml}</div>
             <div class="card-title">${game.title}</div>
             <div class="card-desc">${game.desc}</div>
           </div>
           <div class="card-actions">
-            <button class="btn btn-primary clickable" onclick="launchGame('${game.id}', 'remote')">Play Now</button>
-            <button class="btn btn-secondary clickable" onclick="saveToLibrary('${game.id}')">Download</button>
+            <button class="btn btn-primary clickable" onclick="playGame('${game.id}')">Play Now</button>
+            <button class="btn btn-secondary clickable" onclick="openDownloadModal('${game.id}')">Download</button>
           </div>
         `;
         grid.appendChild(card);
@@ -769,34 +1185,118 @@
 
     function filterGames() {
       const query = document.getElementById('game-search').value.toLowerCase();
-      const filtered = availableGames.filter(g => 
-        g.title.toLowerCase().includes(query) || g.desc.toLowerCase().includes(query)
-      );
+      const filterType = document.getElementById('source-filter').value;
+
+      const filtered = allGames.filter(game => {
+        const matchesQuery = game.title.toLowerCase().includes(query) || 
+                             game.desc.toLowerCase().includes(query) || 
+                             (game.tags && game.tags.some(t => t.toLowerCase().includes(query)));
+        const matchesType = filterType === 'ALL' || game.sourceType === filterType;
+        return matchesQuery && matchesType;
+      });
+
       renderDashboard(filtered);
+    }
+
+    /* --- Sources Rendering --- */
+    function renderSources() {
+      const list = document.getElementById('sources-list');
+      list.innerHTML = '';
+
+      sourcesList.forEach(src => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <div>
+            <div class="badge-container"><span class="badge badge-github">${src.type}</span></div>
+            <div class="card-title" style="font-size:1rem;">${src.name}</div>
+            <div class="card-desc" style="font-size:0.8rem;">${src.url}</div>
+            <div style="font-size:0.85rem; color:var(--accent-green); margin-bottom:12px;">Status: ${src.status} (${src.gameCount} Games Found)</div>
+          </div>
+          <div class="card-actions">
+            <button class="btn btn-primary clickable" onclick="syncSourceByUrl('${src.url}')">Resync Source</button>
+          </div>
+        `;
+        list.appendChild(card);
+      });
+    }
+
+    /* --- File Upload Handler --- */
+    const dropzone = document.getElementById('file-dropzone');
+    dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('dragover'); });
+    dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
+    dropzone.addEventListener('drop', e => {
+      e.preventDefault();
+      dropzone.classList.remove('dragover');
+      if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+    });
+
+    function handleFileSelect(e) {
+      if (e.target.files.length) handleFile(e.target.files[0]);
+    }
+
+    function handleFile(file) {
+      if (!file.name.endsWith('.html') && !file.name.endsWith('.htm')) {
+        alert('Please upload a valid .html file.');
+        return;
+      }
+      playBeep(850, 0.1);
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        const content = evt.target.result;
+        const library = getLibrary();
+        library.push({
+          id: 'user_file_' + Date.now(),
+          title: file.name.replace(/\.[^/.]+$/, ""),
+          desc: 'Direct Imported HTML File',
+          tags: ['Local Import', 'Offline'],
+          code: content
+        });
+        saveLibrary(library);
+        alert(`Successfully imported "${file.name}" to your Library!`);
+        updateLibraryCount();
+      };
+      reader.readAsText(file);
+    }
+
+    /* --- Local Library & Export Engine --- */
+    function getLibrary() {
+      return JSON.parse(localStorage.getItem('gaxerly_library') || '[]');
+    }
+
+    function saveLibrary(lib) {
+      localStorage.setItem('gaxerly_library', JSON.stringify(lib));
+      updateLibraryCount();
+    }
+
+    function updateLibraryCount() {
+      document.getElementById('lib-count').innerText = getLibrary().length;
     }
 
     function renderLibrary() {
       const grid = document.getElementById('library-grid');
       grid.innerHTML = '';
+      const library = getLibrary();
 
-      if (libraryGames.length === 0) {
-        grid.innerHTML = `<div class="empty-state">Your Library is empty. Head to Dashboard or Sources and click "Download" on a game to save it here inside HTML.</div>`;
+      if (library.length === 0) {
+        grid.innerHTML = `<div class="empty-state">Your Library is empty. Click "Download" on any game or drop local HTML files in Sources to save games here.</div>`;
         return;
       }
 
-      libraryGames.forEach((game, index) => {
+      library.forEach((game, index) => {
         const card = document.createElement('div');
         card.className = 'card';
         card.innerHTML = `
           <div>
+            <div class="badge-container"><span class="badge badge-builtin">Library Stored</span></div>
             <div class="card-title">${game.title}</div>
-            <div class="card-desc">Stored locally inside HTML storage.</div>
+            <div class="card-desc">${game.desc || 'Stored in browser storage.'}</div>
           </div>
           <div class="card-actions" style="flex-direction: column;">
-            <button class="btn btn-primary clickable" onclick="launchGame('${index}', 'library')">Play Offline</button>
-            <div style="display:flex; gap: 6px; width: 100%;">
-              <button class="btn btn-secondary clickable" style="flex:1" onclick="downloadAsHtmlFile(${index})">Export .HTML</button>
-              <button class="btn btn-secondary clickable" style="color:var(--accent-magenta)" onclick="removeFromLibrary(${index})">Remove</button>
+            <button class="btn btn-primary clickable" onclick="playLibraryGame(${index})">Play Offline</button>
+            <div style="display:flex; gap:6px; width:100%;">
+              <button class="btn btn-secondary clickable" style="flex:1" onclick="exportHtmlFileFromLib(${index})">Export .HTML</button>
+              <button class="btn btn-secondary clickable" style="color:var(--accent-magenta)" onclick="deleteFromLibrary(${index})">Delete</button>
             </div>
           </div>
         `;
@@ -804,79 +1304,116 @@
       });
     }
 
-    /* --- Download / Library Operations --- */
-    function saveToLibrary(gameId) {
-      playBeep(800, 0.1);
-      const game = availableGames.find(g => g.id === gameId);
-      if (!game) return;
-
-      const exists = libraryGames.some(g => g.title === game.title);
-      if (!exists) {
-        libraryGames.push(game);
-        localStorage.setItem('gaxerly_library', JSON.stringify(libraryGames));
-        alert(`"${game.title}" saved directly to your inside-HTML Library!`);
-      } else {
-        alert('Game is already in your Library.');
-      }
-    }
-
-    function removeFromLibrary(index) {
-      playBeep(300, 0.1);
-      libraryGames.splice(index, 1);
-      localStorage.setItem('gaxerly_library', JSON.stringify(libraryGames));
-      renderLibrary();
-    }
-
-    function downloadAsHtmlFile(index) {
+    function openDownloadModal(gameId) {
       playBeep(700, 0.08);
-      const game = libraryGames[index];
-      const blob = new Blob([game.code || '<html><body><h1>Game File</h1></body></html>'], { type: 'text/html' });
+      selectedGameForDownload = allGames.find(g => g.id === gameId);
+      if (!selectedGameForDownload) return;
+
+      document.getElementById('dl-modal-title').innerText = `Save "${selectedGameForDownload.title}"`;
+      document.getElementById('download-modal').classList.add('active');
+    }
+
+    function closeDownloadModal() {
+      document.getElementById('download-modal').classList.remove('active');
+    }
+
+    async function confirmSaveToLibrary() {
+      if (!selectedGameForDownload) return;
+      playBeep(800, 0.1);
+      showStatus('Fetching game source code for offline storage...');
+
+      let code = selectedGameForDownload.code || '';
+      
+      if (!code && selectedGameForDownload.rawUrl) {
+        try {
+          const res = await fetch(selectedGameForDownload.rawUrl);
+          if (res.ok) code = await res.text();
+        } catch (e) {}
+      }
+
+      const library = getLibrary();
+      library.push({
+        ...selectedGameForDownload,
+        code: code
+      });
+
+      saveLibrary(library);
+      hideStatus();
+      alert(`"${selectedGameForDownload.title}" saved to your Library!`);
+      closeDownloadModal();
+    }
+
+    async function confirmExportHtmlFile() {
+      if (!selectedGameForDownload) return;
+      playBeep(850, 0.1);
+      showStatus('Preparing .HTML export...');
+
+      let gameCode = selectedGameForDownload.code || '';
+
+      if (!gameCode && selectedGameForDownload.rawUrl) {
+        try {
+          const res = await fetch(selectedGameForDownload.rawUrl);
+          if (res.ok) gameCode = await res.text();
+        } catch(e) {}
+      }
+
+      if (!gameCode) {
+        gameCode = `<!DOCTYPE html><html><head><title>${selectedGameForDownload.title}</title></head><body style="margin:0;"><iframe src="${selectedGameForDownload.url}" style="width:100vw;height:100vh;border:none;"></iframe></body></html>`;
+      }
+
+      const blob = new Blob([gameCode], { type: 'text/html' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `${selectedGameForDownload.title.replace(/\s+/g, '_')}.html`;
+      a.click();
+
+      hideStatus();
+      closeDownloadModal();
+    }
+
+    function exportHtmlFileFromLib(index) {
+      const game = getLibrary()[index];
+      if (!game) return;
+      const gameCode = game.code || `<!DOCTYPE html><html><body style="margin:0;"><iframe src="${game.url}" style="width:100vw;height:100vh;border:none;"></iframe></body></html>`;
+      const blob = new Blob([gameCode], { type: 'text/html' });
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
       a.download = `${game.title.replace(/\s+/g, '_')}.html`;
       a.click();
     }
 
-    /* --- Sources Logic --- */
-    function fetchSourceGames(url) {
-      playBeep(650, 0.1);
-      alert(`Synced with source: ${url}\nGames imported and ready on Dashboard!`);
-      renderDashboard();
+    function deleteFromLibrary(index) {
+      playBeep(400, 0.08);
+      const library = getLibrary();
+      library.splice(index, 1);
+      saveLibrary(library);
+      renderLibrary();
     }
 
-    function addCustomSource() {
-      const input = document.getElementById('custom-source-url');
-      const url = input.value.trim();
-      if (!url) return;
-
-      playBeep(750, 0.1);
-      alert(`Successfully added source: ${url}`);
-      input.value = '';
+    /* --- Game Launcher Modal --- */
+    function playGame(gameId) {
+      const game = allGames.find(g => g.id === gameId);
+      if (!game) return;
+      launchIframe(game.title, game.code, game.url);
     }
 
-    /* --- Modal Launcher --- */
-    function launchGame(identifier, type) {
-      playBeep(900, 0.12);
+    function playLibraryGame(index) {
+      const game = getLibrary()[index];
+      if (!game) return;
+      launchIframe(game.title, game.code, game.url);
+    }
+
+    function launchIframe(title, code, url) {
+      playBeep(900, 0.1);
       const modal = document.getElementById('game-modal');
       const iframe = document.getElementById('game-iframe');
-      const title = document.getElementById('modal-title');
+      document.getElementById('modal-title').innerText = `RUNNING: ${title.toUpperCase()}`;
 
-      let game = null;
-      if (type === 'remote') {
-        game = availableGames.find(g => g.id === identifier);
-      } else {
-        game = libraryGames[identifier];
-      }
-
-      if (!game) return;
-
-      title.innerText = `PLAYING: ${game.title.toUpperCase()}`;
       modal.classList.add('active');
-
-      if (game.code && type === 'library') {
-        iframe.srcdoc = game.code;
+      if (code) {
+        iframe.srcdoc = code;
       } else {
-        iframe.src = game.url;
+        iframe.src = url;
       }
     }
 
@@ -889,8 +1426,16 @@
       iframe.srcdoc = '';
     }
 
-    // Init
+    function toggleIframeFullscreen() {
+      const iframe = document.getElementById('game-iframe');
+      if (iframe.requestFullscreen) iframe.requestFullscreen();
+      else if (iframe.webkitRequestFullscreen) iframe.webkitRequestFullscreen();
+    }
+
+    // Initialize App & Trigger Default Sync
+    updateLibraryCount();
     renderDashboard();
+    syncDefaultSource();
   </script>
 </body>
 </html>
