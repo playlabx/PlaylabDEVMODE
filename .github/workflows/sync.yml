@@ -1,0 +1,24 @@
+name: Sync to Second Repo
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Push to playlaab
+        env:
+          SYNC_TOKEN: ${{ secrets.AUTO_SYNC_TOKEN }}
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git remote add target https://x-access-token:${SYNC_TOKEN}@github.com/vrstheft/playlaab.git
+          git push target main --force
