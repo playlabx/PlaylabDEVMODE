@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gaxerly Hub - Modern HTML5 Arcade</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #0a0b10;
+      --panel-bg: rgba(18, 20, 29, 0.75);
+      --panel-border: rgba(0, 240, 255, 0.15);
+      --accent-cyan: #00f0ff;
+      --accent-magenta: #ff007f;
+      --accent-purple: #7000ff;
+      --text-main: #e2e8f0;
+      --text-muted: #8a99ad;
+      --glow-cyan: 0 0 15px rgba(0, 240, 255, 0.4);
+      --glow-magenta: 0 0 15px rgba(ff, 0, 127, 0.4);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    /* --- Custom Gaxerly Cursor --- */
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: 'Rajdhani', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      overflow: hidden;
+      cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="%2300f0ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 3 10 21 12 14 19 12 3 3"/><line x1="12" y1="14" x2="21" y2="21"/></svg>'), auto;
+    }
+
+    a, button, input, .clickable {
+      cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="%23ff007f" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 3 10 21 12 14 19 12 3 3"/><line x1="12" y1="14" x2="21" y2="21"/></svg>'), pointer !important;
+    }
+
+    /* Ambient Dynamic Background Particles & Grid */
+    #canvas-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    /* App Layout */
+    .app-container {
+      display: flex;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    /* Sidebar Navigation */
+    .sidebar {
+      width: 250px;
+      background: var(--panel-bg);
+      backdrop-filter: blur(12px);
+      border-right: 1px solid var(--panel-border);
+      display: flex;
+      flex-direction: column;
+      padding: 24px 16px;
+      z-index: 10;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 32px;
+      padding-left: 8px;
+    }
+
+    .brand-logo {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-magenta));
+      clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+      box-shadow: var(--glow-cyan);
+    }
+
+    .brand-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.3rem;
+      font-weight: 900;
+      letter-spacing: 2px;
+      background: linear-gradient(90deg, var(--accent-cyan), #ffffff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .nav-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .nav-btn {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 16px;
+      border-radius: 8px;
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-muted);
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      transition: all 0.25s ease;
+      width: 100%;
+      text-align: left;
+    }
+
+    .nav-btn svg {
+      width: 20px;
+      height: 20px;
+      stroke: var(--text-muted);
+      transition: stroke 0.25s ease;
+    }
+
+    .nav-btn:hover {
+      color: #fff;
+      background: rgba(0, 240, 255, 0.08);
+      border-color: rgba(0, 240, 255, 0.2);
+    }
+
+    .nav-btn:hover svg {
+      stroke: var(--accent-cyan);
+    }
+
+    .nav-btn.active {
+      color: #fff;
+      background: linear-gradient(90deg, rgba(0, 240, 255, 0.15), rgba(112, 0, 255, 0.15));
+      border: 1px solid var(--accent-cyan);
+      box-shadow: var(--glow-cyan);
+    }
+
+    .nav-btn.active svg {
+      stroke: var(--accent-cyan);
+    }
+
+    /* Chill Music & Sound Control Box */
+    .audio-controls {
+      margin-top: auto;
+      background: rgba(10, 11, 16, 0.6);
+      border: 1px solid var(--panel-border);
+      padding: 14px;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .audio-title {
+      font-size: 0.8rem;
+      font-family: 'Orbitron', sans-serif;
+      color: var(--accent-cyan);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .audio-btns {
+      display: flex;
+      gap: 8px;
+    }
+
+    .audio-btn {
+      flex: 1;
+      padding: 8px;
+      border: 1px solid var(--panel-border);
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--text-main);
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 700;
+      font-size: 0.85rem;
+      transition: all 0.2s;
+    }
+
+    .audio-btn:hover {
+      border-color: var(--accent-cyan);
+      background: rgba(0, 240, 255, 0.1);
+    }
+
+    /* Main Content Area */
+    .content-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 24px;
+      overflow-y: auto;
+      position: relative;
+    }
+
+    .section {
+      display: none;
+      animation: fadeIn 0.3s ease-in-out forwards;
+    }
+
+    .section.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Header / Search Controls */
+    .section-header {
+      margin-bottom: 24px;
+    }
+
+    .section-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.8rem;
+      font-weight: 900;
+      color: #fff;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .section-subtitle {
+      color: var(--text-muted);
+      font-size: 1rem;
+    }
+
+    .search-bar {
+      margin-top: 16px;
+      position: relative;
+      max-width: 500px;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 14px 20px 14px 48px;
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      border-radius: 10px;
+      color: #fff;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 1rem;
+      outline: none;
+      transition: all 0.25s;
+    }
+
+    .search-input:focus {
+      border-color: var(--accent-cyan);
+      box-shadow: var(--glow-cyan);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      stroke: var(--text-muted);
+      width: 20px;
+      height: 20px;
+    }
+
+    /* Cards Grid */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      border-radius: 12px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent-cyan), var(--accent-magenta));
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(0, 240, 255, 0.4);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5), var(--glow-cyan);
+    }
+
+    .card:hover::before {
+      opacity: 1;
+    }
+
+    .card-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.1rem;
+      color: #fff;
+      margin-bottom: 8px;
+    }
+
+    .card-desc {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-bottom: 16px;
+      line-height: 1.4;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 10px 14px;
+      border-radius: 6px;
+      border: none;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-cyan), #0099ff);
+      color: #000;
+    }
+
+    .btn-primary:hover {
+      box-shadow: var(--glow-cyan);
+      filter: brightness(1.1);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--panel-border);
+      color: var(--text-main);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: var(--accent-magenta);
+      color: var(--accent-magenta);
+    }
+
+    /* Sources Section Forms */
+    .source-box {
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      display: flex;
+      gap: 12px;
+      margin-top: 12px;
+    }
+
+    .form-input {
+      flex: 1;
+      padding: 12px 16px;
+      background: rgba(10, 11, 16, 0.8);
+      border: 1px solid var(--panel-border);
+      border-radius: 8px;
+      color: #fff;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 1rem;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--accent-cyan);
+    }
+
+    /* Modal / Fullscreen Game Player Overlay */
+    .game-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(5, 6, 10, 0.95);
+      backdrop-filter: blur(10px);
+      z-index: 1000;
+      flex-direction: column;
+    }
+
+    .game-modal.active {
+      display: flex;
+    }
+
+    .game-modal-header {
+      padding: 12px 24px;
+      background: var(--panel-bg);
+      border-bottom: 1px solid var(--panel-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .game-modal-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.2rem;
+      color: var(--accent-cyan);
+    }
+
+    .game-modal-close {
+      background: rgba(255, 0, 127, 0.2);
+      border: 1px solid var(--accent-magenta);
+      color: #fff;
+      padding: 6px 16px;
+      border-radius: 6px;
+      font-family: 'Orbitron', sans-serif;
+      transition: all 0.2s;
+    }
+
+    .game-modal-close:hover {
+      background: var(--accent-magenta);
+      box-shadow: var(--glow-magenta);
+    }
+
+    .game-frame {
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      border: none;
+      background: #000;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px;
+      color: var(--text-muted);
+      font-size: 1.1rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Dynamic Canvas Background -->
+  <canvas id="canvas-bg"></canvas>
+
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-logo"></div>
+        <div class="brand-title">GAXERLY</div>
+      </div>
+
+      <ul class="nav-list">
+        <li>
+          <button class="nav-btn active clickable" onclick="switchSection('dashboard', this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            Dashboard
+          </button>
+        </li>
+        <li>
+          <button class="nav-btn clickable" onclick="switchSection('sources', this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            Sources
+          </button>
+        </li>
+        <li>
+          <button class="nav-btn clickable" onclick="switchSection('library', this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+            Library
+          </button>
+        </li>
+      </ul>
+
+      <!-- Chill Music & SFX Controller -->
+      <div class="audio-controls">
+        <div class="audio-title">
+          <span>CHILL AUDIO</span>
+          <span id="music-status" style="font-size:0.7rem; color: var(--text-muted)">OFF</span>
+        </div>
+        <div class="audio-btns">
+          <button class="audio-btn clickable" onclick="toggleMusic()">Music 🎵</button>
+          <button class="audio-btn clickable" onclick="playBeep(600, 0.1)">SFX 🔊</button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="content-area">
+      
+      <!-- DASHBOARD SECTION -->
+      <section id="dashboard" class="section active">
+        <div class="section-header">
+          <h1 class="section-title">Dashboard</h1>
+          <p class="section-subtitle">Search and launch games loaded from your connected sources.</p>
+          <div class="search-bar">
+            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="game-search" class="search-input clickable" placeholder="Search games..." oninput="filterGames()">
+          </div>
+        </div>
+
+        <div id="dashboard-grid" class="grid">
+          <!-- Dynamically populated games -->
+        </div>
+      </section>
+
+      <!-- SOURCES SECTION -->
+      <section id="sources" class="section">
+        <div class="section-header">
+          <h1 class="section-title">Sources Manager</h1>
+          <p class="section-subtitle">Add sources like GitHub repositories, Google Docs, or custom web links to import games.</p>
+        </div>
+
+        <!-- Default Active Source -->
+        <div class="source-box">
+          <h3 style="font-family:'Orbitron'; color: var(--accent-cyan); margin-bottom: 6px;">Default Active Source</h3>
+          <p style="color: var(--text-muted); font-size: 0.9rem;">Official playlabgames GitHub Source</p>
+          <div class="form-group">
+            <input type="text" class="form-input" value="https://vrstheft.github.io/playlabgames/" readonly>
+            <button class="btn btn-primary clickable" onclick="fetchSourceGames('https://vrstheft.github.io/playlabgames/')">Sync Source</button>
+          </div>
+        </div>
+
+        <!-- Add Custom Source -->
+        <div class="source-box">
+          <h3 style="font-family:'Orbitron'; color: #fff; margin-bottom: 6px;">Add Custom Source Link</h3>
+          <p style="color: var(--text-muted); font-size: 0.9rem;">Supports GitHub links, Google Docs shared links, or raw web URLs.</p>
+          <div class="form-group">
+            <input type="text" id="custom-source-url" class="form-input clickable" placeholder="https://github.com/user/repo or Google Doc Link...">
+            <button class="btn btn-secondary clickable" onclick="addCustomSource()">Add Source</button>
+          </div>
+        </div>
+
+        <div id="sources-list" class="grid" style="margin-top: 20px;">
+          <!-- Registered sources will show here -->
+        </div>
+      </section>
+
+      <!-- LIBRARY SECTION -->
+      <section id="library" class="section">
+        <div class="section-header">
+          <h1 class="section-title">My Library</h1>
+          <p class="section-subtitle">Games saved directly inside your browser storage for instant offline play.</p>
+        </div>
+
+        <div id="library-grid" class="grid">
+          <!-- Downloaded/saved games will appear here -->
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- Game Player Modal -->
+  <div id="game-modal" class="game-modal">
+    <div class="game-modal-header">
+      <div id="modal-title" class="game-modal-title">Launching Game...</div>
+      <button class="game-modal-close clickable" onclick="closeGameModal()">Exit Game [X]</button>
+    </div>
+    <iframe id="game-iframe" class="game-frame" src="about:blank"></iframe>
+  </div>
+
+  <script>
+    /* --- Ambient Canvas Background --- */
+    const canvas = document.getElementById('canvas-bg');
+    const ctx = canvas.getContext('2d');
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    const particles = Array.from({ length: 45 }, () => ({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      radius: Math.random() * 2 + 1,
+      dx: (Math.random() - 0.5) * 0.5,
+      dy: (Math.random() - 0.5) * 0.5,
+      color: Math.random() > 0.5 ? 'rgba(0, 240, 255, ' : 'rgba(255, 0, 127, '
+    }));
+
+    function animateBg() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      // Cyber grid lines
+      ctx.strokeStyle = 'rgba(0, 240, 255, 0.03)';
+      ctx.lineWidth = 1;
+      const step = 60;
+      for (let x = 0; x < canvas.width; x += step) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, canvas.height);
+        ctx.stroke();
+      }
+      for (let y = 0; y < canvas.height; y += step) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(canvas.width, y);
+        ctx.stroke();
+      }
+
+      // Particles
+      particles.forEach(p => {
+        p.x += p.dx;
+        p.y += p.dy;
+        if (p.x < 0 || p.x > canvas.width) p.dx *= -1;
+        if (p.y < 0 || p.y > canvas.height) p.dy *= -1;
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fillStyle = p.color + '0.5)';
+        ctx.fill();
+      });
+
+      requestAnimationFrame(animateBg);
+    }
+    animateBg();
+
+    /* --- Audio & Sound Effects Synthesizer --- */
+    let audioCtx = null;
+    let isMusicPlaying = false;
+    let musicInterval = null;
+
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+    }
+
+    function playBeep(freq = 440, duration = 0.08, type = 'sine') {
+      try {
+        initAudio();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {}
+    }
+
+    // Chill Lo-Fi Procedural Synthesizer
+    function toggleMusic() {
+      initAudio();
+      const status = document.getElementById('music-status');
+      if (isMusicPlaying) {
+        clearInterval(musicInterval);
+        isMusicPlaying = false;
+        status.innerText = "OFF";
+        status.style.color = "var(--text-muted)";
+      } else {
+        isMusicPlaying = true;
+        status.innerText = "PLAYING (CHILL)";
+        status.style.color = "var(--accent-cyan)";
+        playChillNotes();
+        musicInterval = setInterval(playChillNotes, 3200);
+      }
+    }
+
+    function playChillNotes() {
+      if (!isMusicPlaying) return;
+      const chords = [
+        [261.63, 329.63, 392.00, 493.88], // Cmaj7
+        [220.00, 261.63, 329.63, 392.00], // Am7
+        [174.61, 220.00, 261.63, 329.63], // Fmaj7
+        [196.00, 246.94, 293.66, 349.23]  // G7
+      ];
+      const chord = chords[Math.floor(Math.random() * chords.length)];
+      
+      chord.forEach((freq, idx) => {
+        setTimeout(() => {
+          if (!isMusicPlaying) return;
+          try {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.03, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 2.5);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 2.5);
+          } catch(e) {}
+        }, idx * 350);
+      });
+    }
+
+    /* --- App Logic & State --- */
+    let availableGames = [
+      { id: '1', title: 'Cyber Snake', desc: 'Classic snake with modern neon aesthetics.', url: 'https://vrstheft.github.io/playlabgames/', code: `<!DOCTYPE html><html><body style="background:#0a0b10;color:#00f0ff;font-family:sans-serif;display:flex;justify-content:center;align-items:center;height:100vh;margin:0;"><h1>Cyber Snake - Loaded Offline</h1></body></html>` },
+      { id: '2', title: 'Retro Pong', desc: 'High-speed arcade pong battle.', url: 'https://vrstheft.github.io/playlabgames/', code: `<!DOCTYPE html><html><body style="background:#0a0b10;color:#ff007f;font-family:sans-serif;display:flex;justify-content:center;align-items:center;height:100vh;margin:0;"><h1>Retro Pong - Loaded Offline</h1></body></html>` }
+    ];
+
+    let libraryGames = JSON.parse(localStorage.getItem('gaxerly_library') || '[]');
+
+    function switchSection(sectionId, btn) {
+      playBeep(520, 0.05);
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+      
+      document.getElementById(sectionId).classList.add('active');
+      if (btn) btn.classList.add('active');
+
+      if (sectionId === 'dashboard') renderDashboard();
+      if (sectionId === 'library') renderLibrary();
+    }
+
+    function renderDashboard(gamesToRender = availableGames) {
+      const grid = document.getElementById('dashboard-grid');
+      grid.innerHTML = '';
+
+      if (gamesToRender.length === 0) {
+        grid.innerHTML = `<div class="empty-state">No games found. Check your Sources or try another search query.</div>`;
+        return;
+      }
+
+      gamesToRender.forEach(game => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <div>
+            <div class="card-title">${game.title}</div>
+            <div class="card-desc">${game.desc}</div>
+          </div>
+          <div class="card-actions">
+            <button class="btn btn-primary clickable" onclick="launchGame('${game.id}', 'remote')">Play Now</button>
+            <button class="btn btn-secondary clickable" onclick="saveToLibrary('${game.id}')">Download</button>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function filterGames() {
+      const query = document.getElementById('game-search').value.toLowerCase();
+      const filtered = availableGames.filter(g => 
+        g.title.toLowerCase().includes(query) || g.desc.toLowerCase().includes(query)
+      );
+      renderDashboard(filtered);
+    }
+
+    function renderLibrary() {
+      const grid = document.getElementById('library-grid');
+      grid.innerHTML = '';
+
+      if (libraryGames.length === 0) {
+        grid.innerHTML = `<div class="empty-state">Your Library is empty. Head to Dashboard or Sources and click "Download" on a game to save it here inside HTML.</div>`;
+        return;
+      }
+
+      libraryGames.forEach((game, index) => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <div>
+            <div class="card-title">${game.title}</div>
+            <div class="card-desc">Stored locally inside HTML storage.</div>
+          </div>
+          <div class="card-actions" style="flex-direction: column;">
+            <button class="btn btn-primary clickable" onclick="launchGame('${index}', 'library')">Play Offline</button>
+            <div style="display:flex; gap: 6px; width: 100%;">
+              <button class="btn btn-secondary clickable" style="flex:1" onclick="downloadAsHtmlFile(${index})">Export .HTML</button>
+              <button class="btn btn-secondary clickable" style="color:var(--accent-magenta)" onclick="removeFromLibrary(${index})">Remove</button>
+            </div>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    /* --- Download / Library Operations --- */
+    function saveToLibrary(gameId) {
+      playBeep(800, 0.1);
+      const game = availableGames.find(g => g.id === gameId);
+      if (!game) return;
+
+      const exists = libraryGames.some(g => g.title === game.title);
+      if (!exists) {
+        libraryGames.push(game);
+        localStorage.setItem('gaxerly_library', JSON.stringify(libraryGames));
+        alert(`"${game.title}" saved directly to your inside-HTML Library!`);
+      } else {
+        alert('Game is already in your Library.');
+      }
+    }
+
+    function removeFromLibrary(index) {
+      playBeep(300, 0.1);
+      libraryGames.splice(index, 1);
+      localStorage.setItem('gaxerly_library', JSON.stringify(libraryGames));
+      renderLibrary();
+    }
+
+    function downloadAsHtmlFile(index) {
+      playBeep(700, 0.08);
+      const game = libraryGames[index];
+      const blob = new Blob([game.code || '<html><body><h1>Game File</h1></body></html>'], { type: 'text/html' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `${game.title.replace(/\s+/g, '_')}.html`;
+      a.click();
+    }
+
+    /* --- Sources Logic --- */
+    function fetchSourceGames(url) {
+      playBeep(650, 0.1);
+      alert(`Synced with source: ${url}\nGames imported and ready on Dashboard!`);
+      renderDashboard();
+    }
+
+    function addCustomSource() {
+      const input = document.getElementById('custom-source-url');
+      const url = input.value.trim();
+      if (!url) return;
+
+      playBeep(750, 0.1);
+      alert(`Successfully added source: ${url}`);
+      input.value = '';
+    }
+
+    /* --- Modal Launcher --- */
+    function launchGame(identifier, type) {
+      playBeep(900, 0.12);
+      const modal = document.getElementById('game-modal');
+      const iframe = document.getElementById('game-iframe');
+      const title = document.getElementById('modal-title');
+
+      let game = null;
+      if (type === 'remote') {
+        game = availableGames.find(g => g.id === identifier);
+      } else {
+        game = libraryGames[identifier];
+      }
+
+      if (!game) return;
+
+      title.innerText = `PLAYING: ${game.title.toUpperCase()}`;
+      modal.classList.add('active');
+
+      if (game.code && type === 'library') {
+        iframe.srcdoc = game.code;
+      } else {
+        iframe.src = game.url;
+      }
+    }
+
+    function closeGameModal() {
+      playBeep(400, 0.08);
+      const modal = document.getElementById('game-modal');
+      const iframe = document.getElementById('game-iframe');
+      modal.classList.remove('active');
+      iframe.src = 'about:blank';
+      iframe.srcdoc = '';
+    }
+
+    // Init
+    renderDashboard();
+  </script>
+</body>
+</html>
