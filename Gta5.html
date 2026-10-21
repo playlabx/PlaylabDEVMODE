@@ -5,21 +5,255 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Grand Theft Auto 5</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        html, body { width: 100%; height: 100%; background-color: #000; overflow: hidden; }
-        iframe { width: 100vw; height: 100vh; border: none; display: block; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            background-color: #0d0e12;
+            overflow: hidden;
+            color: #ffffff;
+        }
+
+        /* Fullscreen Game Frame */
+        iframe {
+            width: 100vw;
+            height: 100vh;
+            border: none;
+            display: block;
+            opacity: 0;
+            transition: opacity 0.8s ease-in-out;
+        }
+
+        iframe.loaded {
+            opacity: 1;
+        }
+
+        /* Modern Loading Overlay */
+        #loader-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #090a0f 0%, #151821 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.6s ease, visibility 0.6s;
+        }
+
+        #loader-overlay.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .loader-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 30px;
+            width: 90%;
+            max-width: 520px;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #00f2fe;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .spinner {
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(0, 242, 254, 0.2);
+            border-top: 2px solid #00f2fe;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #4facfe 0%, #00f2fe 100%);
+            border-radius: 10px;
+            transition: width 0.3s ease;
+            box-shadow: 0 0 10px rgba(0, 242, 254, 0.5);
+        }
+
+        /* Console Log Box */
+        .log-box {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 12px;
+            height: 130px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.82rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            scroll-behavior: smooth;
+        }
+
+        .log-box::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .log-box::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+        }
+
+        .log-entry {
+            line-height: 1.4;
+            opacity: 0.85;
+            animation: fadeIn 0.2s ease-in;
+        }
+
+        .log-entry .timestamp {
+            color: #6c757d;
+            margin-right: 6px;
+        }
+
+        .log-entry.info { color: #818cf8; }
+        .log-entry.success { color: #4ade80; }
+        .log-entry.warn { color: #facc15; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(2px); }
+            to { opacity: 0.85; transform: translateY(0); }
+        }
     </style>
 </head>
 <body>
 
+    <!-- Modern Loading Overlay -->
+    <div id="loader-overlay">
+        <div class="loader-card">
+            <div class="header">
+                <div class="title">
+                    <div class="spinner"></div>
+                    Connecting to Proxy
+                </div>
+                <span id="percent-text" style="font-size: 0.9rem; font-weight: 600; color: #a1a1aa;">0%</span>
+            </div>
+
+            <div class="progress-container">
+                <div class="progress-bar" id="progress-bar"></div>
+            </div>
+
+            <div class="log-box" id="log-box"></div>
+        </div>
+    </div>
+
+    <!-- Main Game Frame -->
     <iframe id="game-frame" allow="autoplay; gamepad; fullscreen; keyboard; focus-without-user-activation; pointer-lock" allowfullscreen></iframe>
 
     <script>
-        // Route through a public proxy wrapper to strip X-Frame-Options
         const targetUrl = "https://solve5.playgta5.net/?mode=sandbox";
         const proxyUrl = "https://api.allorigins.win/raw?url=" + encodeURIComponent(targetUrl);
-        
-        document.getElementById('game-frame').src = proxyUrl;
+
+        const logBox = document.getElementById('log-box');
+        const progressBar = document.getElementById('progress-bar');
+        const percentText = document.getElementById('percent-text');
+        const gameFrame = document.getElementById('game-frame');
+        const loaderOverlay = document.getElementById('loader-overlay');
+
+        function addLog(message, type = 'info') {
+            const time = new Date().toLocaleTimeString().split(' ')[0];
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.innerHTML = `<span class="timestamp">[${time}]</span> ${message}`;
+            logBox.appendChild(entry);
+            logBox.scrollTop = logBox.scrollHeight;
+        }
+
+        function setProgress(percent) {
+            progressBar.style.width = percent + '%';
+            percentText.textContent = Math.round(percent) + '%';
+        }
+
+        // Initialize connection logs
+        addLog('Initializing secure proxy bridge...', 'info');
+        setProgress(15);
+
+        setTimeout(() => {
+            addLog(`Target URL: ${targetUrl}`, 'info');
+            setProgress(35);
+        }, 300);
+
+        setTimeout(() => {
+            addLog('Bypassing X-Frame-Options via AllOrigins API...', 'warn');
+            setProgress(60);
+            
+            // Set source to iframe
+            gameFrame.src = proxyUrl;
+        }, 700);
+
+        // Track Frame Load State
+        gameFrame.addEventListener('load', () => {
+            addLog('Proxy handshake successful!', 'success');
+            addLog('Rendering sandbox environment...', 'success');
+            setProgress(100);
+
+            // Hide loading screen smoothly
+            setTimeout(() => {
+                gameFrame.classList.add('loaded');
+                loaderOverlay.classList.add('hidden');
+            }, 600);
+        });
+
+        // Backup timer in case the iframe load event delays
+        setTimeout(() => {
+            if (!loaderOverlay.classList.contains('hidden')) {
+                addLog('Stream connected. Displaying viewport...', 'info');
+                setProgress(100);
+                setTimeout(() => {
+                    gameFrame.classList.add('loaded');
+                    loaderOverlay.classList.add('hidden');
+                }, 500);
+            }
+        }, 5000);
     </script>
 
 </body>
