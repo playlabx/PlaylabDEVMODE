@@ -26,7 +26,6 @@
   .ic{display:block;flex:none}
   .icw{display:inline-flex}
 
-  /* login */
   #loading{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;color:var(--muted)}
   #login{display:none;position:fixed;inset:0;align-items:center;justify-content:center;padding:20px;background:radial-gradient(900px 520px at 12% 8%,rgba(109,94,252,.3),transparent 60%),radial-gradient(800px 500px at 92% 92%,rgba(61,220,151,.15),transparent 60%),var(--rail)}
   .lcard{width:min(400px,100%);background:rgba(24,26,34,.86);backdrop-filter:blur(16px);border:1px solid var(--line);border-radius:22px;padding:34px;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,.5)}
@@ -40,7 +39,6 @@
   .lcard b{color:var(--text)}
   #err{color:var(--bad);font-size:13px;margin-top:14px;min-height:16px}
 
-  /* layout */
   #app{display:none;height:100%;grid-template-columns:72px 256px minmax(0,1fr) 240px}
   #rail{background:var(--rail);display:flex;flex-direction:column;align-items:center;gap:10px;padding:12px 0;overflow-y:auto;overflow-x:hidden}
   .ri{width:48px;height:48px;border-radius:50%;background:var(--raise);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;transition:border-radius .18s,background .18s;flex:none;color:var(--text);overflow:visible;font-weight:700;font-size:15px;user-select:none}
@@ -140,7 +138,6 @@
   .mem:hover{background:var(--raise)}
   .mem .mn{font-weight:600;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
-  /* call stage */
   #stage{display:none;flex:1;min-height:0;flex-direction:column;background:#0d0e13}
   .tiles{flex:1;min-height:0;display:grid;gap:12px;padding:16px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));grid-auto-rows:minmax(160px,1fr);overflow:auto}
   .tile{position:relative;background:var(--raise);border-radius:16px;overflow:hidden;display:flex;align-items:center;justify-content:center;border:2px solid transparent;min-height:160px}
@@ -153,7 +150,6 @@
   .joinprompt{margin:auto;text-align:center;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:14px;padding:30px}
   .joinprompt h2{color:var(--text);margin:0}
 
-  /* modals */
   .overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:18px;z-index:50;animation:fade .15s}
   .card{width:min(460px,100%);max-height:92vh;overflow-y:auto;background:var(--side);border:1px solid var(--line);border-radius:20px;padding:24px;box-shadow:0 30px 80px rgba(0,0,0,.6);animation:pop .18s;position:relative}
   .card.wide{width:min(640px,100%)}
@@ -308,10 +304,9 @@ const $ = id => document.getElementById(id);
 function h(tag, cls, text){ const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
 const FAKE_DOMAIN = '@playlabyapper.app';
 const ADMIN_NAME = 'ryvokex';
-const MAX_FILE = 750 * 1024;      // free database: keep files small
-const MAX_FILES = 10;             // files per message
+const MAX_FILE = 750 * 1024;
+const MAX_FILES = 10;
 
-/* ================= ICONS (no emojis anywhere) ================= */
 const IC = {
   hash:'<line x1="4" y1="9" x2="20" y2="9"/><line x1="4" y1="15" x2="20" y2="15"/><line x1="10" y1="3" x2="8" y2="21"/><line x1="16" y1="3" x2="14" y2="21"/>',
   volume:'<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/>',
@@ -350,7 +345,8 @@ const IC = {
   crown:'<path d="M3 18h18M4 18l-1-10 5 4 4-7 4 7 5-4-1 10"/>',
   zap:'<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>',
   upload:'<polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/>',
-  user:'<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>'
+  user:'<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+  link:'<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>'
 };
 function svg(name, size){ const s = size || 18; return '<svg class="ic" width="' + s + '" height="' + s + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + (IC[name] || '') + '</svg>'; }
 function iconEl(name, size){ const s = h('span', 'icw'); s.innerHTML = svg(name, size); return s; }
@@ -361,7 +357,6 @@ $('menuBtn').innerHTML = svg('menu', 20);
 $('attachBtn').innerHTML = svg('clip', 20);
 $('sendBtn').innerHTML = svg('send', 18);
 
-/* ================= CONSTANTS ================= */
 const COLORS = ['#7c6cff','#4fd1c5','#ff7b9c','#ffb347','#6ee7a0','#5aa9ff','#f472b6','#facc15','#fb7185','#a3e635'];
 const BADGES = {
   dev:      {label:'Dev',             icon:'code',    color:'#9b8fff', desc:'Developer of PlayLab Yapper'},
@@ -400,7 +395,6 @@ function renderText(el, text){
   if (last < text.length) el.append(text.slice(last));
 }
 
-/* ================= SOUNDS (synthesized, no files) ================= */
 let actx = null, muted = false;
 try { muted = localStorage.getItem('yapper_muted') === '1'; } catch(e){}
 function audio(){
@@ -445,7 +439,6 @@ function ringStop(){ if (ringTimer) { clearInterval(ringTimer); ringTimer = null
 document.addEventListener('pointerdown', () => audio(), {once:true});
 document.addEventListener('click', e => { if (e.target.closest('button') && !e.target.closest('#sendBtn')) sfx.click(); });
 
-/* ================= IMAGES & FILES (stored in the free database, so keep small) ================= */
 function loadImage(file){
   return new Promise((res, rej) => {
     const url = URL.createObjectURL(file), im = new Image();
@@ -454,7 +447,6 @@ function loadImage(file){
     im.src = url;
   });
 }
-// crop-to-fill resize, returns a small JPEG data URL
 async function shrinkImage(file, w, h2, q){
   const im = await loadImage(file);
   const cv = document.createElement('canvas'); cv.width = w; cv.height = h2;
@@ -463,7 +455,6 @@ async function shrinkImage(file, w, h2, q){
   cx.drawImage(im, (w - dw) / 2, (h2 - dh) / 2, dw, dh);
   return cv.toDataURL('image/jpeg', q || 0.85);
 }
-// keep aspect ratio, cap longest side
 async function fitImage(file, max, q){
   const im = await loadImage(file);
   const s = Math.min(1, max / Math.max(im.width, im.height));
@@ -503,19 +494,14 @@ async function downloadFile(f){
   setTimeout(() => URL.revokeObjectURL(a.href), 4000);
 }
 
-/* ================= STATE ================= */
 let me = {uid:null, name:null}, myProfile = {}, ADMIN_UID = null, isAdmin = false;
-let view = {type:'home'};   // home | dm {uid,name} | srv {sid,cid}
+let view = {type:'home'};
 let srvs = {};
 const srvRefs = {}, memCache = {}, voiceCache = {};
 let pendingDisplay = null, started = false;
 let refs = [];
 const profCache = {}, badgeCache = {}, uidCache = {};
 let dmList = {};
-
-/* ================= ACCOUNTS ================= */
-// Version gate: the database rules only allow clients that announce a version >= the number in the rules.
-// Older copies of PlayLab Yapper never announce one, so they can no longer read or write anything.
 const CLIENT_VERSION = 3;
 
 function cleanName(s){ return s.trim().toLowerCase(); }
@@ -528,7 +514,6 @@ function showPanel(name){
 function showLogin(){ $('loading').style.display = 'none'; $('login').style.display = 'flex'; $('app').style.display = 'none'; }
 function busy(b){ document.querySelectorAll('#login button').forEach(x => { x.disabled = b; }); }
 
-/* ---- username + password ---- */
 function readForm(){
   const raw = $('userInput').value.trim(), name = cleanName(raw), pass = $('passInput').value;
   if (!validName(name)) { showErr('Username: 3-20 characters, letters, numbers or underscore only.'); return null; }
@@ -538,7 +523,16 @@ function readForm(){
 async function doSignup(){
   const f = readForm(); if (!f) return;
   showErr(''); busy(true); pendingDisplay = f.raw;
-  try { await auth.createUserWithEmailAndPassword(f.name + FAKE_DOMAIN, f.pass); } catch (e) { showErr(friendly(e)); }
+  try {
+    const ex = await db.ref('usernames/' + f.name).get();
+    if (ex.exists()) {
+      const owner = ex.val();
+      const p = await db.ref('profiles/' + owner).get();
+      if (!p.exists()) { try { await db.ref('usernames/' + f.name).remove(); } catch(e){} }
+      else { showErr('That username is taken.'); busy(false); return; }
+    }
+    await auth.createUserWithEmailAndPassword(f.name + FAKE_DOMAIN, f.pass);
+  } catch (e) { showErr(friendly(e)); }
   busy(false);
 }
 async function doLogin(){
@@ -548,7 +542,6 @@ async function doLogin(){
   busy(false);
 }
 
-/* ---- real email with a verification link ---- */
 function readEmail(){
   const email = $('emailInput').value.trim().toLowerCase(), pass = $('emailPass').value;
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showErr('Enter a valid email address.'); return null; }
@@ -597,7 +590,8 @@ async function pickUsername(){
     const ex = await db.ref('usernames/' + name).get();
     if (ex.exists() && ex.val() !== u.uid) { showErr('That username is taken. Try another one.'); busy(false); return; }
     if (!ex.exists()) await db.ref('usernames/' + name).set(u.uid);
-    await db.ref('profiles/' + u.uid).set({name: raw, bio: '', color: pickColor(name), created: TS});
+    await db.ref('profiles/' + u.uid).set({name: raw, bio: '', color: pickColor(name), created: TS, dmPerms: 'everyone', status: 'online'});
+    profCache[u.uid] = null;
     busy(false); afterAuth(u);
   } catch (e) { busy(false); showErr('Could not save your username: ' + e.message); }
 }
@@ -622,7 +616,6 @@ function logout(){
     .then(done, done);
 }
 
-/* ---- session handshake (this is what locks out older versions) ---- */
 async function startSession(){
   const r = db.ref('sessions/' + me.uid), beat = () => r.set({v: CLIENT_VERSION, ts: TS}).catch(() => {});
   await r.set({v: CLIENT_VERSION, ts: TS});
@@ -634,14 +627,22 @@ async function startSession(){
 async function ensureAccount(user, fake){
   if (fake) {
     const uname = user.email.split('@')[0];
-    try { const s = await db.ref('usernames/' + uname).get(); if (!s.exists()) await db.ref('usernames/' + uname).set(user.uid); } catch(e){}
-    try {
-      const p = await db.ref('profiles/' + user.uid).get();
-      if (!p.exists()) {
-        const disp = (pendingDisplay && pendingDisplay.toLowerCase() === uname) ? pendingDisplay : uname;
-        await db.ref('profiles/' + user.uid).set({name: disp, bio: '', color: pickColor(uname), created: TS});
-      }
-    } catch(e){}
+    const s = await db.ref('usernames/' + uname).get();
+    if (s.exists() && s.val() !== user.uid) {
+      const prevProf = await db.ref('profiles/' + s.val()).get();
+      if (!prevProf.exists()) await db.ref('usernames/' + uname).set(user.uid);
+      else throw new Error('username-taken');
+    } else if (!s.exists()) {
+      await db.ref('usernames/' + uname).set(user.uid);
+    }
+    const p = await db.ref('profiles/' + user.uid).get();
+    if (!p.exists()) {
+      const disp = (pendingDisplay && pendingDisplay.toLowerCase() === uname) ? pendingDisplay : uname;
+      await db.ref('profiles/' + user.uid).set({
+        name: disp, bio: '', color: pickColor(uname), created: TS,
+        dmPerms: 'everyone', status: 'online'
+      });
+    }
   }
   try { const a = await db.ref('usernames/' + ADMIN_NAME).get(); ADMIN_UID = a.exists() ? a.val() : null; } catch(e){ ADMIN_UID = null; }
 }
@@ -662,15 +663,22 @@ async function afterAuth(user){
       me.name = (p.val().name || '').toLowerCase();
     } else me.name = user.email.split('@')[0];
     me.uid = user.uid;
-    await ensureAccount(user, fake);
+    try { await ensureAccount(user, fake); }
+    catch (e) {
+      if (e.message === 'username-taken') { showErr('That username is already in use by another account.'); await auth.signOut(); return; }
+      throw e;
+    }
     isAdmin = ADMIN_UID === me.uid;
     myProfile = await getProfile(me.uid, true);
     try { await startSession(); }
     catch (e) { showPanel(fake ? 'user' : 'email'); showLogin(); showErr('Could not start. Make sure the newest database rules are published.'); return; }
+    startPresence();
+    startFriends();
     started = true;
     $('loading').style.display = 'none'; $('login').style.display = 'none'; $('app').style.display = 'grid';
     renderUserbar(); startUserServers(); startDmList(); startRings();
     openChannel('global', 'general'); sfx.join();
+    if (Notification.permission === 'granted') setupPushListeners();
   } finally { initializing = false; }
 }
 auth.onAuthStateChanged(user => {
@@ -680,14 +688,14 @@ auth.onAuthStateChanged(user => {
 
 $('emailPass').addEventListener('keydown', e => { if (e.key === 'Enter') emailLogin(); });
 $('pickInput').addEventListener('keydown', e => { if (e.key === 'Enter') pickUsername(); });
-/* ================= PROFILES, AVATARS, BADGES ================= */
+
 function getProfile(uid, force){
   if (!force && profCache[uid]) return profCache[uid];
   profCache[uid] = db.ref('profiles/' + uid).get().then(s => s.val() || {}).catch(() => ({}));
   return profCache[uid];
 }
 function getBadges(uid){
-  if (uid && uid === ADMIN_UID) return Promise.resolve(Object.keys(BADGES));   // Ryvokex has every badge
+  if (uid && uid === ADMIN_UID) return Promise.resolve(Object.keys(BADGES));
   if (badgeCache[uid]) return badgeCache[uid];
   badgeCache[uid] = db.ref('badges/' + uid).get().then(s => Object.keys(s.val() || {}).filter(k => BADGES[k])).catch(() => []);
   return badgeCache[uid];
@@ -713,27 +721,325 @@ function avatarEl(p, size){
   }
   return a;
 }
-function roundIcon(s, size){   // server icon: uploaded picture or initials
+function roundIcon(s){
   const el = h('div', 'ri-in'); el.style.cssText = 'width:100%;height:100%;display:flex;align-items:center;justify-content:center;border-radius:inherit;overflow:hidden';
   if (s && isImg(s.icon)) { const im = h('img'); im.src = s.icon; im.alt = ''; el.appendChild(im); }
   else el.textContent = initials(s && s.name);
   return el;
 }
+
+/* ================= PRESENCE ================= */
+function detectDevice(){
+  const ua = navigator.userAgent || '';
+  if (/iPad|Tablet/i.test(ua)) return 'tablet';
+  if (/Mobi|Android|iPhone/i.test(ua)) return 'phone';
+  return 'pc';
+}
+const MY_DEVICE = detectDevice();
+let presenceRef = null;
+const presenceCache = {};
+
+function startPresence(){
+  presenceRef = db.ref('presence/' + me.uid);
+  const beat = () => presenceRef.set({online: true, last: Date.now(), device: MY_DEVICE}).catch(() => {});
+  presenceRef.onDisconnect().set({online: false, last: Date.now(), device: MY_DEVICE});
+  beat();
+  setInterval(() => { if (!document.hidden) beat(); }, 60 * 1000);
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) presenceRef.set({online: false, last: Date.now(), device: MY_DEVICE}).catch(()=>{});
+    else beat();
+  });
+  window.addEventListener('beforeunload', () => {
+    presenceRef.set({online: false, last: Date.now(), device: MY_DEVICE}).catch(()=>{});
+  });
+}
+function watchPresence(uid){
+  if (presenceCache[uid] && presenceCache[uid]._watched) return presenceCache[uid];
+  presenceCache[uid] = {_watched: true};
+  db.ref('presence/' + uid).on('value', s => {
+    presenceCache[uid] = Object.assign({_watched: true}, s.val() || {online: false});
+    refreshPresenceUI(uid);
+  });
+  return presenceCache[uid];
+}
+function presenceBadge(uid, size){
+  const p = presenceCache[uid] || {};
+  const wrap = h('span'); wrap.style.cssText = 'display:inline-flex;align-items:center;justify-content:center;margin-left:4px';
+  wrap.title = p.online ? (p.device === 'phone' ? 'Online - phone' : p.device === 'tablet' ? 'Online - tablet' : 'Online - computer') : 'Offline';
+  const c = p.online ? 'var(--good)' : '#7a7f90';
+  if (!p.online) {
+    const d = h('span'); d.style.cssText = 'width:9px;height:9px;border-radius:50%;background:' + c + ';display:inline-block'; wrap.appendChild(d);
+  } else {
+    wrap.innerHTML = svg(p.device === 'phone' ? 'phone' : p.device === 'tablet' ? 'screen' : 'globe', size || 14);
+    wrap.querySelector('svg').style.color = c;
+  }
+  return wrap;
+}
+function refreshPresenceUI(uid){
+  document.querySelectorAll('[data-presence-uid="' + uid + '"]').forEach(el => {
+    el.innerHTML = ''; el.appendChild(presenceBadge(uid, 13));
+  });
+}
+
+/* ================= FRIENDS ================= */
+let friendList = {}, sentReqs = {}, incomingReqs = {};
+function startFriends(){
+  db.ref('friends/' + me.uid).on('value', s => { friendList = s.val() || {}; renderFriendsUI(); });
+  db.ref('sentReqs/' + me.uid).on('value', s => { sentReqs = s.val() || {}; renderFriendsUI(); });
+  db.ref('friendReqs/' + me.uid).on('value', s => {
+    const v = s.val() || {};
+    const had = Object.keys(incomingReqs);
+    incomingReqs = v;
+    Object.keys(v).forEach(from => { if (!had.includes(from)) { sfx.dm(); toast('New friend request!'); } });
+    renderFriendsUI();
+  });
+}
+function renderFriendsUI(){
+  document.querySelectorAll('[data-friends-badge]').forEach(el => {
+    const n = Object.keys(incomingReqs).length;
+    el.textContent = n ? String(n) : '';
+    el.style.display = n ? 'flex' : 'none';
+  });
+  if (document.querySelector('#friendsPanel')) renderFriendsPanel();
+}
+async function sendFriendReq(uid){
+  if (uid === me.uid) return;
+  if (friendList[uid]) { toast('You are already friends.'); return; }
+  try {
+    await db.ref('friendReqs/' + uid + '/' + me.uid).set({ts: Date.now()});
+    await db.ref('sentReqs/' + me.uid + '/' + uid).set(true);
+    toast('Friend request sent'); sfx.send();
+  } catch (e) { sfx.error(); toast('Could not send request: ' + e.message); }
+}
+async function acceptFriend(uid){
+  try {
+    await db.ref('friends/' + me.uid + '/' + uid).set(true);
+    await db.ref('friends/' + uid + '/' + me.uid).set(true);
+    await db.ref('friendReqs/' + me.uid + '/' + uid).remove();
+    await db.ref('sentReqs/' + uid + '/' + me.uid).remove();
+    toast('Friend added!'); sfx.join();
+  } catch (e) { sfx.error(); toast('Could not accept: ' + e.message); }
+}
+async function declineFriend(uid){
+  try {
+    await db.ref('friendReqs/' + me.uid + '/' + uid).remove();
+    await db.ref('sentReqs/' + uid + '/' + me.uid).remove();
+  } catch (e) {}
+}
+function renderFriendsPanel(){
+  const pane = document.querySelector('#friendsPanel'); if (!pane) return;
+  pane.innerHTML = '';
+  pane.appendChild(h('h3', null, 'Friends'));
+  const tabs = h('div', 'tabs2');
+  const t1 = h('button', 'on', 'All'), t2 = h('button', '', 'Requests (' + Object.keys(incomingReqs).length + ')');
+  t1.onclick = () => { t1.className='on'; t2.className=''; drawAll(); };
+  t2.onclick = () => { t2.className='on'; t1.className=''; drawReqs(); };
+  tabs.append(t1, t2); pane.appendChild(tabs);
+  const list = h('div'); list.id = 'friendsList'; pane.appendChild(list);
+  const drawAll = async () => {
+    list.innerHTML = '';
+    const ids = Object.keys(friendList);
+    if (!ids.length) { list.appendChild(h('div', 'hint', 'No friends yet. Use the search bar to find people.')); return; }
+    for (const uid of ids) {
+      const p = await getProfile(uid), row = h('div', 'listrow');
+      row.appendChild(avatarEl(p, 34));
+      const nm = h('div', 'grow', p.name || uid); row.appendChild(nm);
+      row.appendChild(btnIcon('Message', 'chat', 'ghost', () => { closeModal(); openDm(uid, (p.name||'').toLowerCase()); }));
+      list.appendChild(row);
+    }
+  };
+  const drawReqs = async () => {
+    list.innerHTML = '';
+    const ids = Object.keys(incomingReqs);
+    if (!ids.length) { list.appendChild(h('div', 'hint', 'No pending requests.')); return; }
+    for (const uid of ids) {
+      const p = await getProfile(uid), row = h('div', 'listrow');
+      row.appendChild(avatarEl(p, 34));
+      const nm = h('div', 'grow', p.name || uid); row.appendChild(nm);
+      row.appendChild(btnIcon('Accept', 'check', 'good', () => { acceptFriend(uid); setTimeout(drawReqs, 200); }));
+      row.appendChild(btnIcon('Decline', 'x', 'danger', () => { declineFriend(uid); setTimeout(drawReqs, 200); }));
+      list.appendChild(row);
+    }
+  };
+  drawAll();
+}
+function openFriends(){
+  modal(card => {
+    card.id = 'friendsPanel'; card.classList.add('wide');
+    renderFriendsPanel();
+    const cl = h('button', 'ghost', 'Close'); cl.onclick = closeModal; actions(card, [cl]);
+  }, true);
+}
+
+/* ================= SETTINGS ================= */
+async function openSettings(tab){
+  tab = tab || 'account';
+  const p = await getProfile(me.uid, true);
+  const u = auth.currentUser;
+  modal(card => {
+    card.classList.add('wide');
+    card.appendChild(h('h3', null, 'Settings'));
+    const tabs = h('div', 'tabs2');
+    const TABS = [['account','Account'],['profile','Profile'],['privacy','Privacy'],['notif','Notifications'],['devices','Devices'],['connections','Connections']];
+    TABS.forEach(([k,l]) => { const b = h('button', tab===k?'on':'', l); b.onclick = () => openSettings(k); tabs.appendChild(b); });
+    card.appendChild(tabs);
+    if (tab === 'account') settingsAccount(card, u, p);
+    if (tab === 'profile') settingsProfile(card, p);
+    if (tab === 'privacy') settingsPrivacy(card, p);
+    if (tab === 'notif') settingsNotif(card);
+    if (tab === 'devices') settingsDevices(card, u);
+    if (tab === 'connections') settingsConnections(card, p);
+    const cl = h('button', 'ghost', 'Close'); cl.onclick = closeModal; actions(card, [cl]);
+  }, true);
+}
+function settingsAccount(card, u, p){
+  card.appendChild(h('label', 'l', 'Username'));
+  card.appendChild(h('div', 'sub', 'Usernames are permanent in this build.'));
+  card.appendChild(h('div', null, '@' + (p.name || '').toLowerCase()));
+  card.appendChild(h('label', 'l', 'Display name'));
+  const disp = h('input'); disp.maxLength = 20; disp.value = p.name || ''; card.appendChild(disp);
+  const saveDisp = h('button', null, 'Save display name');
+  saveDisp.onclick = async () => {
+    const v = disp.value.trim(); if (v.length < 3) { toast('Display name too short'); sfx.error(); return; }
+    try { await db.ref('profiles/' + me.uid).update({name: v}); myProfile = await getProfile(me.uid, true); renderUserbar(); toast('Saved'); }
+    catch (e) { sfx.error(); toast('Could not save: ' + e.message); }
+  };
+  card.appendChild(saveDisp);
+  card.appendChild(h('label', 'l', 'Email'));
+  card.appendChild(h('div', 'sub', u.email || ''));
+  card.appendChild(h('label', 'l', 'Phone'));
+  const ph = h('input'); ph.placeholder = '+1 555 123 4567'; ph.value = p.phone || ''; card.appendChild(ph);
+  const savePh = h('button', 'ghost', 'Save phone');
+  savePh.onclick = async () => { try { await db.ref('profiles/' + me.uid).update({phone: ph.value.trim().slice(0,20)}); toast('Saved'); } catch(e){ sfx.error(); toast(e.message); } };
+  card.appendChild(savePh);
+  card.appendChild(h('label', 'l', 'Two-factor authentication'));
+  card.appendChild(h('div', 'sub', 'Enable 2FA on the Google account that owns this Firebase project. Once enabled, both your password and a one-time code are required to sign in.'));
+  card.appendChild(h('label', 'l', 'Password'));
+  card.appendChild(h('div', 'sub', 'Use "Forgot password?" on the login screen, or update it from the Firebase console.'));
+  card.appendChild(h('label', 'l', 'Account status'));
+  card.appendChild(h('div', null, 'Active - no reports'));
+}
+function settingsProfile(card, p){
+  card.appendChild(h('div', 'sub', 'Use Edit profile on your own avatar to change pictures, color and bio.'));
+  card.appendChild(btnIcon('Edit profile', 'sliders', 'menuitem', () => { closeModal(); editProfile(); }));
+}
+function settingsPrivacy(card, p){
+  card.appendChild(h('label', 'l', 'Who can DM you'));
+  const sel = h('select');
+  [['everyone','Everyone'],['friends','Friends only']].forEach(([v,l]) => { const o = h('option', null, l); o.value = v; if ((p.dmPerms||'everyone')===v) o.selected = true; sel.appendChild(o); });
+  card.appendChild(sel);
+  const save = h('button', null, 'Save');
+  save.onclick = async () => { try { await db.ref('profiles/' + me.uid).update({dmPerms: sel.value}); toast('Saved'); } catch(e){ toast(e.message); } };
+  card.appendChild(save);
+  card.appendChild(h('label', 'l', 'Search visibility'));
+  card.appendChild(h('div', 'sub', 'Your username is always searchable so friends can find you.'));
+}
+function settingsNotif(card){
+  card.appendChild(h('label', 'l', 'Desktop notifications'));
+  const on = 'Notification' in window && Notification.permission === 'granted';
+  card.appendChild(h('div', 'sub', 'Status: ' + (on ? 'Enabled' : 'Disabled')));
+  const ask = h('button', null, 'Enable desktop notifications');
+  ask.onclick = () => requestNotifPermission();
+  card.appendChild(ask);
+  card.appendChild(h('label', 'l', 'Sound effects'));
+  card.appendChild(toggle(!muted, v => { muted = !v; try { localStorage.setItem('yapper_muted', muted?'1':'0'); } catch(e){} renderUserbar(); }));
+  card.appendChild(h('label', 'l', 'Notify me about'));
+  card.appendChild(h('div', 'sub', 'Direct messages, incoming calls and friend requests are all notified. This works even when the tab is in the background.'));
+}
+function settingsDevices(card, u){
+  card.appendChild(h('label', 'l', 'This device'));
+  const d = h('div', 'listrow');
+  d.appendChild(iconEl(MY_DEVICE === 'phone' ? 'phone' : MY_DEVICE === 'tablet' ? 'screen' : 'globe', 20));
+  d.appendChild(h('div', 'grow', MY_DEVICE === 'phone' ? 'Phone' : MY_DEVICE === 'tablet' ? 'Tablet' : 'Computer'));
+  card.appendChild(d);
+  card.appendChild(h('div', 'sub', 'Sign-in sessions are managed by Firebase. If you suspect a stranger is using your account, change your password using "Forgot password?" on the login screen.'));
+}
+function settingsConnections(card, p){
+  card.appendChild(h('div', 'sub', 'Link accounts to display what you are doing on your profile.'));
+  const conns = p.connections || {};
+  [['spotify','Spotify'],['github','GitHub'],['youtube','YouTube'],['steam','Steam']].forEach(([k,label]) => {
+    const row = h('div', 'listrow');
+    row.appendChild(iconEl('link', 18));
+    const col = h('div', 'grow');
+    col.appendChild(h('div', null, label));
+    const st = h('div', 'sub', conns[k] ? ('Connected as ' + (conns[k].user || 'you')) : 'Not connected');
+    col.appendChild(st); row.appendChild(col);
+    if (conns[k]) row.appendChild(btnIcon('Remove', 'x', 'danger', async () => {
+      try { await db.ref('profiles/' + me.uid + '/connections/' + k).remove(); toast('Removed'); settingsConnectionsRefresh(); } catch(e){ toast(e.message); }
+    }));
+    else row.appendChild(btnIcon('Connect', 'plus', 'good', async () => {
+      const val = prompt('Enter your ' + label + ' username:');
+      if (!val) return;
+      try { await db.ref('profiles/' + me.uid + '/connections/' + k).set({user: val.slice(0,60), ts: Date.now()}); toast(label + ' linked'); settingsConnectionsRefresh(); }
+      catch(e){ toast(e.message); }
+    }));
+    card.appendChild(row);
+  });
+}
+function settingsConnectionsRefresh(){ closeModal(); setTimeout(() => openSettings('connections'), 50); }
+
+/* ================= DESKTOP NOTIFICATIONS ================= */
+function requestNotifPermission(){
+  if (!('Notification' in window)) { toast('Your browser does not support notifications.'); return; }
+  Notification.requestPermission().then(p => { toast('Notifications: ' + p); if (p === 'granted') setupPushListeners(); });
+}
+function notify(title, body, tag){
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+  try { new Notification(title, {body, tag, icon: 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="64" height="64"><rect width="24" height="24" rx="6" fill="#6d5efc"/><path d="M13 2 3 14h9l-1 8 10-12h-9z" fill="#fff"/></svg>')}); } catch(e){}
+}
+let pushListenersOn = false;
+function setupPushListeners(){
+  if (pushListenersOn) return; pushListenersOn = true;
+  db.ref('userDms/' + me.uid).on('value', snap => {
+    const v = snap.val() || {};
+    Object.keys(v).forEach(o => {
+      const d = v[o];
+      if (!d || d.from === me.uid) return;
+      if (document.hidden || !document.hasFocus()) {
+        getProfile(o).then(p => notify((p.name || 'New message'), 'Sent you a message', 'dm-' + o));
+      }
+    });
+  });
+  db.ref('rings/' + me.uid).on('child_added', snap => {
+    const m = snap.val(); if (!m) return;
+    if (document.hidden || !document.hasFocus()) {
+      notify((m.name || 'Someone') + ' is calling', 'Incoming ' + m.kind + ' call', 'ring-' + snap.key);
+    }
+  });
+  db.ref('friendReqs/' + me.uid).on('child_added', snap => {
+    if (document.hidden || !document.hasFocus()) {
+      getProfile(snap.key).then(p => notify('Friend request', (p.name || 'Someone') + ' wants to be friends', 'fr-' + snap.key));
+    }
+  });
+}
+
 function renderUserbar(){
   const u = $('userbar'); u.innerHTML = '';
   const w = h('div', 'who'); w.appendChild(avatarEl(myProfile, 36));
   const t = h('div'); t.style.minWidth = 0;
-  t.appendChild(h('div', 'nm', myProfile.name || me.name)); t.appendChild(h('div', 'sub', 'Online'));
+  const nmRow = h('div'); nmRow.style.cssText = 'display:flex;align-items:center';
+  const nm = h('div', 'nm', myProfile.name || me.name); nmRow.appendChild(nm);
+  const presSlot = h('span'); presSlot.dataset.presenceUid = me.uid; nmRow.appendChild(presSlot);
+  watchPresence(me.uid);
+  t.appendChild(nmRow); t.appendChild(h('div', 'sub', 'Online'));
   w.appendChild(t); w.onclick = () => showProfile(me.uid);
   u.appendChild(w);
   const snd = ibtn(muted ? 'volumex' : 'volume', 'Sound effects on/off', () => {
     muted = !muted; try { localStorage.setItem('yapper_muted', muted ? '1' : '0'); } catch(e){}
     renderUserbar(); if (!muted) sfx.join();
   });
-  u.append(snd, ibtn('sliders', 'Edit profile', editProfile), ibtn('logout', 'Log out', logout));
+  const friendsBtn = ibtn('user', 'Friends', openFriends);
+  const friendsDot = h('span', 'dot'); friendsDot.style.display = 'none'; friendsDot.dataset.friendsBadge = '1';
+  friendsBtn.appendChild(friendsDot);
+  u.append(
+    snd,
+    friendsBtn,
+    ibtn('sliders', 'Settings', () => openSettings('account')),
+    ibtn('logout', 'Log out', logout)
+  );
+  renderFriendsUI();
 }
 
-/* ================= MODALS ================= */
 function modal(build, wide){
   const o = h('div', 'overlay'), c = h('div', 'card' + (wide ? ' wide' : '')); o.appendChild(c);
   o.onclick = e => { if (e.target === o) closeModal(); };
@@ -796,19 +1102,32 @@ function editProfile(){
 
 async function showProfile(uid, sid){
   const p = await getProfile(uid, uid === me.uid), bl = await getBadges(uid);
+  watchPresence(uid);
   modal(card => {
     const banner = h('div', 'pbanner');
     banner.style.backgroundImage = isImg(p.banner) ? 'url(' + p.banner + ')' : 'linear-gradient(135deg,' + (p.color || '#7c6cff') + ',' + (p.color || '#7c6cff') + '44)';
     card.appendChild(banner);
     const wrap = h('div', 'pavwrap'); wrap.appendChild(avatarEl(p, 80)); card.appendChild(wrap);
-    const nm = h('div', 'pname'); const n = h('span', null, p.name || 'Unknown'); n.style.color = p.color || '#fff'; nm.appendChild(n); card.appendChild(nm);
+    const nm = h('div', 'pname'); const n = h('span', null, p.name || 'Unknown'); n.style.color = p.color || '#fff'; nm.appendChild(n);
+    const presSlot = h('span'); presSlot.dataset.presenceUid = uid; nm.appendChild(presSlot);
+    card.appendChild(nm);
     const uname = (p.name || '').toLowerCase();
     card.appendChild(h('div', 'sub', '@' + uname));
+    if (p.status) card.appendChild(h('div', 'sub', 'Status: ' + p.status));
     if (bl.length) {
       card.appendChild(h('label', 'l', 'Badges'));
       const bw = h('div', 'badges'); bw.style.gap = '8px';
       Object.keys(BADGES).filter(k => bl.includes(k)).forEach(k => bw.appendChild(pillEl(k, true)));
       card.appendChild(bw);
+    }
+    if (p.connections && Object.keys(p.connections).length) {
+      card.appendChild(h('label', 'l', 'Connections'));
+      Object.keys(p.connections).forEach(k => {
+        const row = h('div', 'listrow');
+        row.appendChild(iconEl('link', 18));
+        row.appendChild(h('div', 'grow', k + ': ' + (p.connections[k].user || 'connected')));
+        card.appendChild(row);
+      });
     }
     if (sid && sid !== 'global' && srvs[sid]) {
       const rl = rolesOf(sid, uid);
@@ -822,7 +1141,6 @@ async function showProfile(uid, sid){
     }
     if (p.bio) { card.appendChild(h('label', 'l', 'About me')); card.appendChild(h('div', 'text', p.bio)); }
     if (p.created) { card.appendChild(h('label', 'l', 'Member since')); card.appendChild(h('div', null, new Date(p.created).toLocaleDateString([], {year:'numeric', month:'long', day:'numeric'}))); }
-    // role management inside a server
     if (sid && sid !== 'global' && srvs[sid] && uid !== me.uid && uid !== srvs[sid].owner) {
       const roleIds = Object.keys(srvs[sid].roles || {});
       if (can(sid, 'manageRoles') && roleIds.length) {
@@ -847,16 +1165,21 @@ async function showProfile(uid, sid){
       act.push(k);
     }
     if (uid === me.uid) act.push(btnIcon('Edit profile', 'sliders', '', editProfile));
-    else if (uname) act.push(btnIcon('Message', 'chat', '', () => { closeModal(); openDm(uid, uname); }));
+    else if (uname) {
+      act.push(btnIcon('Message', 'chat', '', () => { closeModal(); openDm(uid, uname); }));
+      if (friendList[uid]) { const b = btnIcon('Friends', 'check', 'good', () => {}); b.disabled = true; act.push(b); }
+      else if (sentReqs[uid]) { const b = btnIcon('Request sent', 'check', 'ghost', () => {}); b.disabled = true; act.push(b); }
+      else act.push(btnIcon('Add friend', 'plus', '', () => { sendFriendReq(uid); closeModal(); }));
+    }
     actions(card, act);
   });
 }
 
-/* ================= PERMISSIONS ================= */
 function isOwner(sid){ return sid !== 'global' && !!srvs[sid] && srvs[sid].owner === me.uid; }
 function memberOf(sid, uid){ return memCache[sid] && memCache[sid][uid]; }
 function can(sid, perm){
-  if (sid === 'global') return isAdmin && perm === 'manageMessages';
+  if (sid === 'global') return isAdmin;
+  if (isAdmin) return true;
   if (isOwner(sid)) return true;
   const m = memberOf(sid, me.uid), p = (m && m.perms) || {};
   return p.admin === true || p[perm] === true;
@@ -886,7 +1209,6 @@ async function setMemberRole(sid, uid, rid, on){
   } catch (e) { sfx.error(); toast('Could not change role: ' + e.message); }
 }
 
-/* ================= SERVERS ================= */
 function getServer(sid){ return sid === 'global' ? {name: GLOBAL.name} : srvs[sid]; }
 function chans(sid){
   if (sid === 'global') return GLOBAL.order.map(id => ({id, name: id, type: 'text'}));
@@ -923,17 +1245,20 @@ function dropServer(sid){
 }
 function waitFor(fn, ms){ return new Promise(res => { const t0 = Date.now(); const iv = setInterval(() => { if (fn() || Date.now() - t0 > ms) { clearInterval(iv); res(); } }, 100); }); }
 
-async function createServer(name, iconData){
+async function createServer(name, iconData, channelPlan){
   name = name.trim().slice(0, 30); if (!name) { toast('Give your server a name'); sfx.error(); return; }
   try {
     const sid = db.ref('servers').push().key;
-    const data = {name, owner: me.uid, created: TS, channels: {general:{name:'general', type:'text'}, 'off-topic':{name:'off-topic', type:'text'}, lounge:{name:'Lounge', type:'voice'}}};
+    const channels = {};
+    const plan = channelPlan && channelPlan.length ? channelPlan : [{name:'general',type:'text'},{name:'off-topic',type:'text'},{name:'Lounge',type:'voice'}];
+    plan.forEach(ch => { const id = ch.name.toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'').slice(0,24); if (id && !channels[id]) channels[id] = {name: ch.name, type: ch.type}; });
+    const data = {name, owner: me.uid, created: TS, channels};
     if (iconData) data.icon = iconData;
     await db.ref('servers/' + sid).set(data);
     await db.ref('members/' + sid + '/' + me.uid).set({joined: TS});
     await db.ref('userServers/' + me.uid + '/' + sid).set(true);
     closeModal(); sfx.join();
-    await waitFor(() => srvs[sid], 3000); openChannel(sid, 'general');
+    await waitFor(() => srvs[sid], 3000); openChannel(sid, Object.keys(channels)[0]);
   } catch (e) { sfx.error(); toast('Could not create server: ' + e.message); }
 }
 async function joinServer(code){
@@ -957,14 +1282,40 @@ function serverModal(){
       tabs.append(t1, t2); card.appendChild(tabs);
       if (tab === 'create') {
         const row = h('div'); row.style.cssText = 'display:flex;align-items:center;gap:14px';
-        const prev = h('div', 'ri'); prev.style.cursor = 'pointer'; prev.appendChild(roundIcon({name: card._name || 'S', icon}, 56)); prev.style.width = prev.style.height = '64px';
+        const prev = h('div', 'ri'); prev.style.cursor = 'pointer'; prev.appendChild(roundIcon({name: card._name || 'S', icon}));
+        prev.style.width = prev.style.height = '64px';
         prev.onclick = () => pickFile('image/*', async f => { try { icon = await shrinkImage(f, 128, 128, 0.85); card._name = $('srvName') ? $('srvName').value : card._name; draw(); } catch(e){ toast(e.message); } });
         row.append(prev, h('div', 'sub', 'Click the circle to upload a server icon (optional).')); row.lastChild.style.margin = '0';
         card.appendChild(row);
         card.appendChild(h('label', 'l', 'Server name'));
         const inp = h('input'); inp.id = 'srvName'; inp.maxLength = 30; inp.placeholder = 'My awesome server'; inp.value = card._name || ''; card.appendChild(inp);
+
+        card.appendChild(h('label', 'l', 'Channels'));
+        let plan = card._plan || [{name:'general',type:'text'},{name:'off-topic',type:'text'},{name:'Lounge',type:'voice'}];
+        const planBox = h('div');
+        const drawPlan = () => {
+          card._plan = plan;
+          planBox.innerHTML = '';
+          plan.forEach((ch, i) => {
+            const row = h('div', 'listrow');
+            row.appendChild(iconEl(ch.type === 'voice' ? 'volume' : 'hash', 16));
+            const nm = h('input'); nm.value = ch.name; nm.style.flex = '1';
+            nm.oninput = () => { plan[i].name = nm.value; };
+            row.appendChild(nm);
+            const tt = h('button', 'ghost', ch.type === 'voice' ? 'Voice' : 'Text');
+            tt.onclick = () => { plan[i].type = ch.type === 'voice' ? 'text' : 'voice'; drawPlan(); };
+            row.appendChild(tt);
+            row.appendChild(ibtn('trash', 'Remove', () => { plan.splice(i,1); drawPlan(); }, 'off'));
+            planBox.appendChild(row);
+          });
+          const add = btnIcon('Add channel', 'plus', 'ghost', () => { plan.push({name:'new-channel',type:'text'}); drawPlan(); });
+          planBox.appendChild(add);
+        };
+        drawPlan();
+        card.appendChild(planBox);
+
         const cancel = h('button', 'ghost', 'Cancel'); cancel.onclick = closeModal;
-        const go = h('button', null, 'Create'); go.onclick = () => createServer(inp.value, icon);
+        const go = h('button', null, 'Create'); go.onclick = () => createServer(inp.value, icon, plan);
         inp.onkeydown = e => { if (e.key === 'Enter') go.click(); };
         actions(card, [cancel, go]); setTimeout(() => inp.focus(), 30);
       } else {
@@ -981,7 +1332,20 @@ function serverModal(){
 }
 
 function serverMenu(){
-  const sid = view.sid; if (sid === 'global' || !srvs[sid]) return;
+  const sid = view.sid; if (!sid) return;
+  if (sid === 'global') {
+    if (!isAdmin) { toast('Only staff can manage PlayLab Global'); return; }
+    modal(card => {
+      card.appendChild(h('h3', null, 'PlayLab Global'));
+      card.appendChild(h('div', 'sub', 'Admin controls for the global server.'));
+      const list = h('div');
+      list.appendChild(btnIcon('Channel settings', 'sliders', 'menuitem', () => globalChannelSettings()));
+      card.appendChild(list);
+      const cl = h('button', 'ghost', 'Close'); cl.onclick = closeModal; actions(card, [cl]);
+    });
+    return;
+  }
+  if (!srvs[sid]) return;
   modal(card => {
     card.appendChild(h('h3', null, srvs[sid].name)); card.appendChild(h('div', 'sub', 'Share the invite code so friends can join.'));
     const code = h('input'); code.value = sid; code.readOnly = true; code.onclick = () => code.select(); card.appendChild(code);
@@ -991,7 +1355,7 @@ function serverMenu(){
     if (can(sid, 'manageServer') || can(sid, 'manageChannels') || can(sid, 'manageRoles') || can(sid, 'kick')) {
       list.appendChild(btnIcon('Server settings', 'sliders', 'menuitem', () => serverSettings(sid)));
     }
-    if (isOwner(sid)) {
+    if (isOwner(sid) || isAdmin) {
       const del = btnIcon('Delete server', 'trash', 'menuitem danger', async () => {
         if (!confirm('Delete this server for everyone? This cannot be undone.')) return;
         try {
@@ -1012,7 +1376,36 @@ function serverMenu(){
   });
 }
 
-/* ---------- server settings: overview / channels / roles / members ---------- */
+function globalChannelSettings(){
+  modal(card => {
+    card.appendChild(h('h3', null, 'Global channels'));
+    card.appendChild(h('div', 'sub', 'Add, rename or delete channels inside PlayLab Global.'));
+    GLOBAL.order.forEach(cid => {
+      const row = h('div', 'listrow');
+      row.appendChild(iconEl('hash', 18));
+      const inp = h('input'); inp.value = cid; inp.style.flex = '1';
+      row.appendChild(inp);
+      row.appendChild(ibtn('check', 'Save', () => {
+        const nn = inp.value.trim().toLowerCase().replace(/[^a-z0-9_-]/g,'');
+        if (!nn) return;
+        GLOBAL.order = GLOBAL.order.map(x => x === cid ? nn : x);
+        renderSidebar(); toast('Renamed');
+      }, 'good'));
+      if (GLOBAL.order.length > 1) row.appendChild(ibtn('trash', 'Delete', () => {
+        GLOBAL.order = GLOBAL.order.filter(x => x !== cid);
+        renderSidebar(); toast('Channel removed');
+      }, 'off'));
+      card.appendChild(row);
+    });
+    const add = btnIcon('Add channel', 'plus', '', () => {
+      const n = prompt('Channel name:'); if (!n) return;
+      const cid = n.toLowerCase().replace(/[^a-z0-9_-]/g,'').slice(0,24);
+      if (cid && !GLOBAL.order.includes(cid)) { GLOBAL.order.push(cid); renderSidebar(); toast('Channel added'); }
+    });
+    const cl = h('button', 'ghost', 'Close'); cl.onclick = closeModal; actions(card, [cl, add]);
+  });
+}
+
 function serverSettings(sid, tab){
   tab = tab || (can(sid, 'manageServer') ? 'overview' : can(sid, 'manageChannels') ? 'channels' : can(sid, 'manageRoles') ? 'roles' : 'members');
   const s = srvs[sid]; if (!s) return;
@@ -1033,8 +1426,8 @@ function serverSettings(sid, tab){
 function settingsOverview(card, sid){
   const s = srvs[sid]; let icon = s.icon || null, name = s.name;
   const row = h('div'); row.style.cssText = 'display:flex;align-items:center;gap:14px';
-  const prev = h('div', 'ri'); prev.style.cssText = 'width:64px;height:64px;cursor:pointer'; prev.appendChild(roundIcon({name, icon}, 56));
-  prev.onclick = () => pickFile('image/*', async f => { try { icon = await shrinkImage(f, 128, 128, 0.85); prev.innerHTML = ''; prev.appendChild(roundIcon({name, icon}, 56)); } catch(e){ toast(e.message); } });
+  const prev = h('div', 'ri'); prev.style.cssText = 'width:64px;height:64px;cursor:pointer'; prev.appendChild(roundIcon({name, icon}));
+  prev.onclick = () => pickFile('image/*', async f => { try { icon = await shrinkImage(f, 128, 128, 0.85); prev.innerHTML = ''; prev.appendChild(roundIcon({name, icon})); } catch(e){ toast(e.message); } });
   row.append(prev, h('div', 'sub', 'Click to change the server icon.')); row.lastChild.style.margin = '0'; card.appendChild(row);
   card.appendChild(h('label', 'l', 'Server name'));
   const inp = h('input'); inp.maxLength = 30; inp.value = name; card.appendChild(inp);
@@ -1156,7 +1549,7 @@ async function settingsMembers(card, sid){
   }
   const cl = h('button', 'ghost', 'Close'); cl.onclick = closeModal; actions(card, [cl]);
 }
-/* ================= NAVIGATION ================= */
+
 function detach(){ refs.forEach(r => r.off()); refs = []; }
 function stopFeed(){ if (feed.q) { feed.q.off(); feed.q = null; } }
 function goHome(){ detach(); stopFeed(); view = {type:'home'}; $('sidebar').classList.remove('open'); renderAll(); }
@@ -1220,7 +1613,7 @@ function renderSidebar(){
   }
   const s = getServer(view.sid); if (!s) return;
   head.appendChild(h('span', 'nm', s.name));
-  if (view.sid !== 'global') head.appendChild(ibtn('more', 'Server menu', serverMenu));
+  if (view.sid !== 'global' || isAdmin) head.appendChild(ibtn('more', 'Server menu', serverMenu));
   const list = chans(view.sid);
   const sect = (label, type) => {
     const items = list.filter(c => c.type === type); if (!items.length) return;
@@ -1271,8 +1664,12 @@ function renderMain(){
       ok = !!c && c.type === 'text' && !(view.sid === 'global' && view.cid === 'announcements' && !isAdmin);
       ph = 'Message #' + (c ? c.name : '');
     }
-    if (view.type === 'home') { msgs.innerHTML = ''; const e = h('div', 'empty'); e.innerHTML = svg('chat', 44); e.appendChild(h('div', null, 'Pick a conversation, or find someone by username to start one.')); e.firstChild.style.margin = '0 auto 12px'; msgs.appendChild(e); }
-    if (view.type === 'srv' && !ok) { const c = curChannel(); if (c && c.type === 'text') { /* locked channel */ } }
+    if (view.type === 'home') {
+      msgs.innerHTML = '';
+      const e = h('div', 'empty'); e.innerHTML = svg('chat', 44);
+      e.appendChild(h('div', null, 'Pick a conversation, or find someone by username to start one.'));
+      e.firstChild.style.margin = '0 auto 12px'; msgs.appendChild(e);
+    }
   }
   comp.style.display = (!stage && ok) ? 'block' : 'none';
   pend.style.display = (!stage && ok && pendingFiles.length) ? 'flex' : 'none';
@@ -1280,7 +1677,6 @@ function renderMain(){
   if (stage) renderStage();
 }
 
-/* ================= MESSAGE FEED ================= */
 let feed = {q:null, ready:false, last:null, map:{}, path:null};
 function loadFeed(path){
   stopFeed();
@@ -1292,7 +1688,11 @@ function loadFeed(path){
   q.on('child_removed', snap => { const el = f.map[snap.key]; if (el) el.remove(); });
   q.once('value').then(s => {
     f.ready = true;
-    if (!s.exists()) { const w = h('div', 'welcome'); w.appendChild(h('h2', null, view.type === 'dm' ? 'Start of your chat with ' + view.name : 'Welcome to #' + view.cid)); w.appendChild(h('div', null, 'Say something!')); box.appendChild(w); }
+    if (!s.exists()) {
+      const w = h('div', 'welcome');
+      w.appendChild(h('h2', null, view.type === 'dm' ? 'Start of your chat with ' + view.name : 'Welcome to #' + view.cid));
+      w.appendChild(h('div', null, 'Say something!')); box.appendChild(w);
+    }
     box.scrollTop = box.scrollHeight;
   }).catch(() => {});
 }
@@ -1334,7 +1734,9 @@ function appendRow(m, mid, f){
     let av = avatarEl({name: m.name || '?'}, 42); av.onclick = () => showProfile(m.uid, sid);
     const head = h('div', 'head'), nm = h('span', 'name', m.name || '...'); nm.onclick = () => showProfile(m.uid, sid);
     const bd = h('span', 'badges'); fillBadges(bd, m.uid);
-    head.append(nm, bd, h('span', 'time', fmtTime(ts))); body.appendChild(head); row.append(av, body);
+    const presSlot = h('span'); presSlot.dataset.presenceUid = m.uid; watchPresence(m.uid);
+    head.append(nm, bd, presSlot, h('span', 'time', fmtTime(ts)));
+    body.appendChild(head); row.append(av, body);
     getProfile(m.uid).then(p => { nm.textContent = p.name || m.name || 'user'; nm.style.color = nameColorFor(sid, m.uid, p); const n = avatarEl(p, 42); n.onclick = () => showProfile(m.uid, sid); av.replaceWith(n); });
   } else row.append(h('div', 'gut', new Date(ts).toLocaleTimeString([], {hour:'numeric', minute:'2-digit'})), body);
   if (m.text) { const t = h('div', 'text'); renderText(t, m.text); body.appendChild(t); }
@@ -1350,7 +1752,6 @@ function appendRow(m, mid, f){
   if (f.ready && m.uid !== me.uid) { sfx.msg(); if (view.type === 'dm') markRead(view.uid); }
 }
 
-/* ================= SENDING ================= */
 let lastSend = 0;
 function setPending(list){
   pendingFiles = list; const p = $('pending'); p.innerHTML = '';
@@ -1428,7 +1829,6 @@ async function runCommand(text){
   return false;
 }
 
-/* ================= MEMBERS PANEL ================= */
 function loadMembers(sid){
   const r = db.ref('members/' + sid); refs.push(r);
   r.on('value', snap => { memCache[sid] = snap.val() || {}; if (view.type === 'srv' && view.sid === sid) { renderMembersPanel(); renderSidebar(); renderMain(); } }, () => {});
@@ -1455,19 +1855,27 @@ async function renderMembersPanel(){
       if (!g.list.length) return;
       pane.appendChild(h('div', 'label', g.label + ' - ' + g.list.length));
       g.list.sort((a, b) => (a.p.name || '').localeCompare(b.p.name || '')).forEach(({uid, p}) => {
+        watchPresence(uid);
         const row = h('div', 'mem'); row.appendChild(avatarEl(p, 34));
         const wrap = h('div'); wrap.style.minWidth = 0;
-        const nm = h('div', 'mn', p.name || 'user'); nm.style.color = nameColorFor(sid, uid, p); wrap.appendChild(nm);
+        const nmRow = h('div'); nmRow.style.cssText = 'display:flex;align-items:center';
+        const nm = h('div', 'mn', p.name || 'user'); nm.style.color = nameColorFor(sid, uid, p); nmRow.appendChild(nm);
+        const pres = h('span'); pres.dataset.presenceUid = uid; nmRow.appendChild(pres);
+        wrap.appendChild(nmRow);
         const bd = h('span', 'badges'); fillBadges(bd, uid); wrap.appendChild(bd);
         row.appendChild(wrap); row.onclick = () => showProfile(uid, sid); pane.appendChild(row);
       });
     });
   } else if (view.type === 'dm') {
     const p = await getProfile(view.uid); if (tok !== memToken) return;
+    watchPresence(view.uid);
     const banner = h('div'); banner.style.cssText = 'height:70px;border-radius:12px;background-size:cover;background-position:center;' + (isImg(p.banner) ? 'background-image:url(' + p.banner + ')' : 'background:linear-gradient(135deg,' + (p.color || '#7c6cff') + ',' + (p.color || '#7c6cff') + '44)');
     pane.appendChild(banner);
     const av = avatarEl(p, 64); av.style.cssText += ';margin:-30px 0 8px 10px;border:4px solid var(--side)'; av.onclick = () => showProfile(view.uid); pane.appendChild(av);
-    const nm = h('div', 'pname', p.name || view.name); nm.style.cssText = 'font-size:18px;padding:0 6px'; nm.style.color = p.color || '#fff'; pane.appendChild(nm);
+    const nmRow = h('div'); nmRow.style.cssText = 'display:flex;align-items:center;padding:0 6px';
+    const nm = h('div', 'pname', p.name || view.name); nm.style.cssText = 'font-size:18px'; nm.style.color = p.color || '#fff'; nmRow.appendChild(nm);
+    const pres = h('span'); pres.dataset.presenceUid = view.uid; nmRow.appendChild(pres);
+    pane.appendChild(nmRow);
     const bd = h('div', 'badges'); bd.style.cssText = 'padding:6px'; fillBadges(bd, view.uid); pane.appendChild(bd);
     if (p.bio) { const b = h('div', 'hint', p.bio); pane.appendChild(b); }
   } else if (view.type === 'srv') {
@@ -1479,7 +1887,6 @@ async function renderMembersPanel(){
   }
 }
 
-/* ================= SAVED DMs ================= */
 let dmInit = false;
 function lrKey(){ return 'yapper_lr_' + me.uid; }
 function getLR(){ try { return JSON.parse(localStorage.getItem(lrKey()) || '{}'); } catch(e){ return {}; } }
@@ -1514,11 +1921,10 @@ async function startDm(raw){
   if (!uid) { toast('No user called "' + name + '"'); sfx.error(); return; }
   openDm(uid, name);
 }
-/* ================= CALLS (WebRTC, signalling through the database) ================= */
+
 let call = null, incoming = null;
 const ICE = {iceServers: [
   {urls: ['stun:stun.l.google.com:19302', 'stun:stun1.l.google.com:19302']},
-  // best-effort free relay for people behind strict networks (may not always be available)
   {urls: ['turn:openrelay.metered.ca:80', 'turn:openrelay.metered.ca:443'], username: 'openrelayproject', credential: 'openrelayproject'}
 ]};
 
@@ -1647,7 +2053,6 @@ function removeLocal(c, stream){
   });
 }
 
-/* ---------- speaking detection ---------- */
 function watchAudio(c, uid, stream){
   const ac = audio(); if (!ac || !stream || !stream.getAudioTracks().length) return;
   try {
@@ -1667,7 +2072,6 @@ function speakTick(c){
   });
 }
 
-/* ---------- controls ---------- */
 function toggleMic(){
   if (!call) return; call.muted = !call.muted;
   if (call.micStream) call.micStream.getAudioTracks().forEach(t => { t.enabled = !call.muted; });
@@ -1698,7 +2102,7 @@ async function toggleScreen(){
     c.screenStream = s; addLocal(c, s, 'screen');
     s.getVideoTracks()[0].onended = () => { if (c.screenStream === s) toggleScreen(); };
     renderCallUI();
-  } catch (e) { /* user cancelled */ }
+  } catch (e) {}
 }
 async function leaveCall(){
   const c = call; if (!c) return; call = null;
@@ -1715,7 +2119,6 @@ function gotoCall(){
   if (call.view.type === 'dm') openDm(call.view.uid, call.view.name); else openChannel(call.view.sid, call.view.cid);
 }
 
-/* ---------- call UI ---------- */
 function renderCallUI(){ if (stageMode()) renderStage(); updateCallbar(); }
 function updateCallbar(){
   const cb = $('callbar'); if (!call) { cb.style.display = 'none'; return; }
@@ -1770,7 +2173,6 @@ function renderStage(){
   st.appendChild(bar);
 }
 
-/* ---------- DM calls with ringing ---------- */
 async function startDmCall(uid, name, video){
   if (call) { toast('You are already in a call.'); sfx.error(); return; }
   const chat = dmChatId(me.uid, uid);
@@ -1781,7 +2183,7 @@ async function startDmCall(uid, name, video){
   try { await rr.set({name: myProfile.name || me.name, kind: video ? 'video' : 'voice', ts: TS}); rr.onDisconnect().remove(); }
   catch (e) { toast('Could not ring them: ' + e.message); leaveCall(); return; }
   ringStart();
-  c.ringTimeout = setTimeout(() => { if (call === c && Object.keys(c.peers).length < 2) { toast('No answer.'); leaveCall(); } }, 45000);
+  c.ringTimeout = setTimeout(() => { if (call === c && Object.keys(c.peers).length < 2) { toast('No answer - call ended.'); leaveCall(); } }, 15000);
   rr.on('value', s => {
     if (s.exists() || call !== c || c.ringRef !== rr) return;
     setTimeout(() => { if (call === c && Object.keys(c.peers).length < 2) { toast(name + ' declined the call.'); leaveCall(); } }, 1500);
@@ -1816,7 +2218,6 @@ async function acceptCall(){
   openDm(inc.from, uname);
 }
 
-/* ================= KEYS ================= */
 $('userInput').addEventListener('keydown', e => { if (e.key === 'Enter') $('passInput').focus(); });
 $('passInput').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
 window.addEventListener('beforeunload', () => { if (call && call.meRef) call.meRef.remove(); });
