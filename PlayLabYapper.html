@@ -36,6 +36,8 @@
   .lcard input{margin-bottom:10px}
   .lcard .btns{display:flex;gap:10px;margin-top:6px}
   .lcard .btns button{flex:1;padding:12px}
+  .lnk{color:var(--accent2);font-size:13px;margin-top:16px;cursor:pointer} .lnk:hover{text-decoration:underline}
+  .lcard b{color:var(--text)}
   #err{color:var(--bad);font-size:13px;margin-top:14px;min-height:16px}
 
   /* layout */
@@ -116,14 +118,15 @@
   .pill.big{width:auto;height:auto;padding:5px 10px;gap:6px;font-size:12px;font-weight:600}
   .rtag{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:3px 9px;border-radius:20px;background:var(--raise2)}
   .rtag i{width:9px;height:9px;border-radius:50%;display:block}
-  .att{margin-top:6px}
+  .atts{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+  .att{margin:0}
   .att img{max-width:min(380px,100%);max-height:320px;border-radius:12px;display:block;cursor:zoom-in;background:var(--raise)}
   .att .ph{width:min(300px,100%);height:150px;border-radius:12px;background:var(--raise);display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:13px}
   .fchip{display:flex;align-items:center;gap:12px;background:var(--raise);border:1px solid var(--line);border-radius:12px;padding:12px 14px;max-width:340px;cursor:pointer}
   .fchip:hover{border-color:var(--accent)}
   .fchip .fn{font-weight:600;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .fchip .fs{font-size:12px;color:var(--muted)}
-  #pending{display:none;padding:0 18px 8px}
+  #pending{display:none;padding:0 18px 8px;gap:8px;flex-wrap:wrap}
   #pending .pc{display:inline-flex;align-items:center;gap:10px;background:var(--raise);border:1px solid var(--line);border-radius:12px;padding:8px 8px 8px 14px;font-size:13px}
   #composer{padding:0 18px 18px;flex:none}
   #composer .box{display:flex;gap:6px;background:var(--raise);border:1px solid var(--line);border-radius:14px;padding:5px 6px 5px 6px;align-items:center}
@@ -211,13 +214,44 @@
   <div class="lcard">
     <div class="mark" id="loginMark"></div>
     <h1>PlayLab Yapper</h1>
-    <p>Pick a username and password. New here? Hit Sign up.</p>
-    <input id="userInput" placeholder="Username" maxlength="20" autocomplete="username" autocapitalize="none" spellcheck="false">
-    <input id="passInput" type="password" placeholder="Password (6+ characters)" autocomplete="current-password">
-    <div class="btns">
-      <button id="loginBtn" onclick="doLogin()">Log in</button>
-      <button id="signupBtn" class="ghost" onclick="doSignup()">Sign up</button>
+
+    <div id="panelUser">
+      <p>Pick a username and password. New here? Hit Sign up.</p>
+      <input id="userInput" placeholder="Username" maxlength="20" autocomplete="username" autocapitalize="none" spellcheck="false">
+      <input id="passInput" type="password" placeholder="Password (6+ characters)" autocomplete="current-password">
+      <div class="btns">
+        <button id="loginBtn" onclick="doLogin()">Log in</button>
+        <button id="signupBtn" class="ghost" onclick="doSignup()">Sign up</button>
+      </div>
+      <div class="lnk" onclick="showPanel('email')">Use a verified email instead</div>
     </div>
+
+    <div id="panelEmail" style="display:none">
+      <p>Sign up with your email. We send you a verification link, you click it, and you're in.</p>
+      <input id="emailInput" type="email" placeholder="you@example.com" autocomplete="email">
+      <input id="emailPass" type="password" placeholder="Password (6+ characters)" autocomplete="current-password">
+      <div class="btns">
+        <button onclick="emailLogin()">Log in</button>
+        <button class="ghost" onclick="emailSignup()">Sign up</button>
+      </div>
+      <div class="lnk" onclick="forgotPassword()">Forgot password?</div>
+      <div class="lnk" onclick="showPanel('user')">Use a username instead</div>
+    </div>
+
+    <div id="panelVerify" style="display:none">
+      <p>We sent a verification link to<br><b id="verifyEmail"></b><br>Open it (check spam too), then come back and press the button.</p>
+      <div class="btns"><button onclick="checkVerified()">I verified my email</button></div>
+      <div class="btns"><button class="ghost" onclick="resendVerify()">Resend email</button></div>
+      <div class="lnk" onclick="logout()">Use a different account</div>
+    </div>
+
+    <div id="panelPick" style="display:none">
+      <p>Email verified. Now choose your PlayLab Yapper username. Others will find and message you with it.</p>
+      <input id="pickInput" placeholder="Username" maxlength="20" autocapitalize="none" spellcheck="false">
+      <div class="btns"><button onclick="pickUsername()">Continue</button></div>
+      <div class="lnk" onclick="logout()">Log out</div>
+    </div>
+
     <div id="err"></div>
   </div>
 </div>
@@ -244,7 +278,7 @@
         <input id="input" maxlength="500" autocomplete="off" placeholder="Message...">
         <button class="send" id="sendBtn" onclick="sendMsg()"></button>
       </div>
-      <input type="file" id="fileIn" style="display:none">
+      <input type="file" id="fileIn" style="display:none" multiple>
     </div>
   </main>
   <aside id="members"></aside>
@@ -275,6 +309,7 @@ function h(tag, cls, text){ const e = document.createElement(tag); if (cls) e.cl
 const FAKE_DOMAIN = '@playlabyapper.app';
 const ADMIN_NAME = 'ryvokex';
 const MAX_FILE = 750 * 1024;      // free database: keep files small
+const MAX_FILES = 10;             // files per message
 
 /* ================= ICONS (no emojis anywhere) ================= */
 const IC = {
@@ -479,10 +514,21 @@ const profCache = {}, badgeCache = {}, uidCache = {};
 let dmList = {};
 
 /* ================= ACCOUNTS ================= */
+// Version gate: the database rules only allow clients that announce a version >= the number in the rules.
+// Older copies of PlayLab Yapper never announce one, so they can no longer read or write anything.
+const CLIENT_VERSION = 3;
+
 function cleanName(s){ return s.trim().toLowerCase(); }
 function validName(s){ return /^[a-z0-9_]{3,20}$/.test(s); }
-function showErr(m){ $('err').textContent = m; if (m) sfx.error(); }
-function busy(b){ $('loginBtn').disabled = b; $('signupBtn').disabled = b; }
+function showErr(m){ $('err').textContent = m || ''; if (m) sfx.error(); }
+function showPanel(name){
+  ['User', 'Email', 'Verify', 'Pick'].forEach(n => { $('panel' + n).style.display = n.toLowerCase() === name ? 'block' : 'none'; });
+  showErr('');
+}
+function showLogin(){ $('loading').style.display = 'none'; $('login').style.display = 'flex'; $('app').style.display = 'none'; }
+function busy(b){ document.querySelectorAll('#login button').forEach(x => { x.disabled = b; }); }
+
+/* ---- username + password ---- */
 function readForm(){
   const raw = $('userInput').value.trim(), name = cleanName(raw), pass = $('passInput').value;
   if (!validName(name)) { showErr('Username: 3-20 characters, letters, numbers or underscore only.'); return null; }
@@ -501,10 +547,66 @@ async function doLogin(){
   try { await auth.signInWithEmailAndPassword(f.name + FAKE_DOMAIN, f.pass); } catch (e) { showErr(friendly(e)); }
   busy(false);
 }
+
+/* ---- real email with a verification link ---- */
+function readEmail(){
+  const email = $('emailInput').value.trim().toLowerCase(), pass = $('emailPass').value;
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showErr('Enter a valid email address.'); return null; }
+  if (email.endsWith(FAKE_DOMAIN)) { showErr('Use a real email address.'); return null; }
+  if (pass.length < 6) { showErr('Password must be at least 6 characters.'); return null; }
+  return {email, pass};
+}
+async function emailSignup(){
+  const f = readEmail(); if (!f) return;
+  showErr(''); busy(true);
+  try { const c = await auth.createUserWithEmailAndPassword(f.email, f.pass); await c.user.sendEmailVerification(); }
+  catch (e) { showErr(friendly(e)); }
+  busy(false);
+}
+async function emailLogin(){
+  const f = readEmail(); if (!f) return;
+  showErr(''); busy(true);
+  try { await auth.signInWithEmailAndPassword(f.email, f.pass); } catch (e) { showErr(friendly(e)); }
+  busy(false);
+}
+async function forgotPassword(){
+  const email = $('emailInput').value.trim();
+  if (!email) { showErr('Type your email in the box first.'); return; }
+  try { await auth.sendPasswordResetEmail(email); toast('Password reset email sent. Check your inbox and spam folder.'); }
+  catch (e) { showErr(friendly(e)); }
+}
+async function resendVerify(){
+  try { await auth.currentUser.sendEmailVerification(); toast('Verification email sent again. Check spam too.'); }
+  catch (e) { showErr(friendly(e)); }
+}
+async function checkVerified(){
+  const u = auth.currentUser; if (!u) return;
+  busy(true);
+  try { await u.reload(); } catch(e){}
+  busy(false);
+  if (auth.currentUser.emailVerified) afterAuth(auth.currentUser);
+  else showErr('Not verified yet. Open the link in the email first, then try again.');
+}
+async function pickUsername(){
+  const raw = $('pickInput').value.trim(), name = cleanName(raw), u = auth.currentUser;
+  if (!u) return;
+  if (!validName(name)) { showErr('Username: 3-20 characters, letters, numbers or underscore only.'); return; }
+  if (name === ADMIN_NAME) { showErr('That name is reserved.'); return; }
+  busy(true);
+  try {
+    const ex = await db.ref('usernames/' + name).get();
+    if (ex.exists() && ex.val() !== u.uid) { showErr('That username is taken. Try another one.'); busy(false); return; }
+    if (!ex.exists()) await db.ref('usernames/' + name).set(u.uid);
+    await db.ref('profiles/' + u.uid).set({name: raw, bio: '', color: pickColor(name), created: TS});
+    busy(false); afterAuth(u);
+  } catch (e) { busy(false); showErr('Could not save your username: ' + e.message); }
+}
+
 function friendly(e){
   switch (e.code) {
-    case 'auth/email-already-in-use': return 'That username is taken. Try another one.';
-    case 'auth/invalid-credential': case 'auth/wrong-password': case 'auth/user-not-found': return 'Wrong username or password.';
+    case 'auth/email-already-in-use': return 'That username or email is already taken.';
+    case 'auth/invalid-email': return 'That email address looks wrong.';
+    case 'auth/invalid-credential': case 'auth/wrong-password': case 'auth/user-not-found': return 'Wrong username/email or password.';
     case 'auth/weak-password': return 'Password is too weak. Use at least 6 characters.';
     case 'auth/operation-not-allowed': return 'Email/Password sign-in is not turned on in Firebase yet.';
     case 'auth/too-many-requests': return 'Too many tries. Wait a minute and try again.';
@@ -512,34 +614,72 @@ function friendly(e){
     default: return e.message || 'Something went wrong.';
   }
 }
-function logout(){ (call ? leaveCall() : Promise.resolve()).then(() => auth.signOut()).then(() => location.reload()); }
 
-async function ensureAccount(user){
-  const uname = user.email.split('@')[0];
-  try { const s = await db.ref('usernames/' + uname).get(); if (!s.exists()) await db.ref('usernames/' + uname).set(user.uid); } catch(e){}
-  try {
-    const p = await db.ref('profiles/' + user.uid).get();
-    if (!p.exists()) {
-      const disp = (pendingDisplay && pendingDisplay.toLowerCase() === uname) ? pendingDisplay : uname;
-      await db.ref('profiles/' + user.uid).set({name: disp, bio: '', color: pickColor(uname), created: TS});
-    }
-  } catch(e){}
+function logout(){
+  const done = () => auth.signOut().then(() => location.reload());
+  (call ? leaveCall() : Promise.resolve())
+    .then(() => (me.uid ? db.ref('sessions/' + me.uid).remove().catch(() => {}) : null))
+    .then(done, done);
+}
+
+/* ---- session handshake (this is what locks out older versions) ---- */
+async function startSession(){
+  const r = db.ref('sessions/' + me.uid), beat = () => r.set({v: CLIENT_VERSION, ts: TS}).catch(() => {});
+  await r.set({v: CLIENT_VERSION, ts: TS});
+  setInterval(beat, 30 * 60 * 1000);
+  db.ref('.info/connected').on('value', s => { if (s.val()) beat(); });
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) beat(); });
+}
+
+async function ensureAccount(user, fake){
+  if (fake) {
+    const uname = user.email.split('@')[0];
+    try { const s = await db.ref('usernames/' + uname).get(); if (!s.exists()) await db.ref('usernames/' + uname).set(user.uid); } catch(e){}
+    try {
+      const p = await db.ref('profiles/' + user.uid).get();
+      if (!p.exists()) {
+        const disp = (pendingDisplay && pendingDisplay.toLowerCase() === uname) ? pendingDisplay : uname;
+        await db.ref('profiles/' + user.uid).set({name: disp, bio: '', color: pickColor(uname), created: TS});
+      }
+    } catch(e){}
+  }
   try { const a = await db.ref('usernames/' + ADMIN_NAME).get(); ADMIN_UID = a.exists() ? a.val() : null; } catch(e){ ADMIN_UID = null; }
 }
-auth.onAuthStateChanged(async user => {
-  $('loading').style.display = 'none';
-  if (!user) { $('app').style.display = 'none'; $('login').style.display = 'flex'; return; }
-  if (started) return;
-  started = true;
-  me.uid = user.uid; me.name = user.email.split('@')[0];
-  await ensureAccount(user);
-  isAdmin = ADMIN_UID === me.uid;
-  myProfile = await getProfile(me.uid, true);
-  $('login').style.display = 'none'; $('app').style.display = 'grid';
-  renderUserbar(); startUserServers(); startDmList(); startRings();
-  openChannel('global', 'general');
-  sfx.join();
+
+let initializing = false;
+async function afterAuth(user){
+  if (started || initializing) return;
+  initializing = true;
+  try {
+    const fake = (user.email || '').endsWith(FAKE_DOMAIN);
+    if (!fake) {
+      try { await user.reload(); } catch(e){}
+      user = auth.currentUser;
+      if (!user.emailVerified) { $('verifyEmail').textContent = user.email; showPanel('verify'); showLogin(); return; }
+      await user.getIdToken(true);
+      const p = await db.ref('profiles/' + user.uid).get();
+      if (!p.exists()) { showPanel('pick'); showLogin(); return; }
+      me.name = (p.val().name || '').toLowerCase();
+    } else me.name = user.email.split('@')[0];
+    me.uid = user.uid;
+    await ensureAccount(user, fake);
+    isAdmin = ADMIN_UID === me.uid;
+    myProfile = await getProfile(me.uid, true);
+    try { await startSession(); }
+    catch (e) { showPanel(fake ? 'user' : 'email'); showLogin(); showErr('Could not start. Make sure the newest database rules are published.'); return; }
+    started = true;
+    $('loading').style.display = 'none'; $('login').style.display = 'none'; $('app').style.display = 'grid';
+    renderUserbar(); startUserServers(); startDmList(); startRings();
+    openChannel('global', 'general'); sfx.join();
+  } finally { initializing = false; }
+}
+auth.onAuthStateChanged(user => {
+  if (!user) { showPanel('user'); showLogin(); return; }
+  afterAuth(user);
 });
+
+$('emailPass').addEventListener('keydown', e => { if (e.key === 'Enter') emailLogin(); });
+$('pickInput').addEventListener('keydown', e => { if (e.key === 'Enter') pickUsername(); });
 /* ================= PROFILES, AVATARS, BADGES ================= */
 function getProfile(uid, force){
   if (!force && profCache[uid]) return profCache[uid];
@@ -1118,7 +1258,7 @@ function renderTopbar(){
   t.appendChild(iconEl(c.type === 'voice' ? 'volume' : 'hash', 18)); t.appendChild(h('span', null, c.name));
 }
 
-let pendingFile = null;
+let pendingFiles = [];
 function renderMain(){
   const stage = stageMode(), msgs = $('msgs'), comp = $('composer'), pend = $('pending');
   $('stage').style.display = stage ? 'flex' : 'none';
@@ -1135,7 +1275,7 @@ function renderMain(){
     if (view.type === 'srv' && !ok) { const c = curChannel(); if (c && c.type === 'text') { /* locked channel */ } }
   }
   comp.style.display = (!stage && ok) ? 'block' : 'none';
-  pend.style.display = (!stage && ok && pendingFile) ? 'block' : 'none';
+  pend.style.display = (!stage && ok && pendingFiles.length) ? 'flex' : 'none';
   $('input').placeholder = ph;
   if (stage) renderStage();
 }
@@ -1147,7 +1287,7 @@ function loadFeed(path){
   const box = $('msgs'); box.innerHTML = '';
   const f = feed = {q: null, ready: false, last: null, map: {}, path};
   const q = db.ref(path).orderByChild('ts').limitToLast(100); f.q = q;
-  q.on('child_added', snap => { const m = snap.val(); if (m && (typeof m.text === 'string' || m.file)) appendRow(m, snap.key, f); },
+  q.on('child_added', snap => { const m = snap.val(); if (m && (typeof m.text === 'string' || m.file || m.files)) appendRow(m, snap.key, f); },
     err => { box.innerHTML = ''; box.appendChild(h('div', 'empty', 'Could not load messages: ' + err.message)); });
   q.on('child_removed', snap => { const el = f.map[snap.key]; if (el) el.remove(); });
   q.once('value').then(s => {
@@ -1177,6 +1317,10 @@ function attEl(file){
   }
   return wrap;
 }
+function attsOf(m){
+  if (m.files) return Array.isArray(m.files) ? m.files : Object.keys(m.files).sort((a, b) => a - b).map(k => m.files[k]);
+  return m.file ? [m.file] : [];
+}
 function lightbox(src){ const l = h('div', 'lightbox'); const im = h('img'); im.src = src; l.appendChild(im); l.onclick = () => l.remove(); document.body.appendChild(l); }
 
 function appendRow(m, mid, f){
@@ -1194,7 +1338,8 @@ function appendRow(m, mid, f){
     getProfile(m.uid).then(p => { nm.textContent = p.name || m.name || 'user'; nm.style.color = nameColorFor(sid, m.uid, p); const n = avatarEl(p, 42); n.onclick = () => showProfile(m.uid, sid); av.replaceWith(n); });
   } else row.append(h('div', 'gut', new Date(ts).toLocaleTimeString([], {hour:'numeric', minute:'2-digit'})), body);
   if (m.text) { const t = h('div', 'text'); renderText(t, m.text); body.appendChild(t); }
-  if (m.file) body.appendChild(attEl(m.file));
+  const atts = attsOf(m);
+  if (atts.length) { const wrap = h('div', 'atts'); atts.forEach(a => wrap.appendChild(attEl(a))); body.appendChild(wrap); }
   if (canDeleteMsg(m)) {
     const d = ibtn('trash', 'Delete message', () => db.ref(f.path + '/' + mid).remove().catch(e => toast('Could not delete: ' + e.message)), 'del');
     row.appendChild(d);
@@ -1207,50 +1352,62 @@ function appendRow(m, mid, f){
 
 /* ================= SENDING ================= */
 let lastSend = 0;
-function setPending(file){
-  pendingFile = file; const p = $('pending'); p.innerHTML = '';
-  if (file) {
-    const c = h('div', 'pc'); c.appendChild(iconEl(file.type.startsWith('image/') ? 'image' : 'file', 18));
+function setPending(list){
+  pendingFiles = list; const p = $('pending'); p.innerHTML = '';
+  list.forEach((file, i) => {
+    const c = h('div', 'pc'); c.appendChild(iconEl(file.type.startsWith('image/') ? 'image' : 'file', 16));
     c.appendChild(h('span', null, file.name + '  (' + fmtSize(file.size) + ')'));
-    c.appendChild(ibtn('x', 'Remove', () => setPending(null))); p.appendChild(c);
+    c.appendChild(ibtn('x', 'Remove', () => setPending(pendingFiles.filter((_, j) => j !== i)))); p.appendChild(c);
+  });
+  p.style.display = (list.length && !stageMode()) ? 'flex' : 'none';
+}
+function attachFiles(fs){
+  const next = pendingFiles.slice();
+  for (const f of fs) {
+    if (next.length >= MAX_FILES) { toast('You can attach up to ' + MAX_FILES + ' files per message.'); break; }
+    if (!f.type.startsWith('image/') && f.size > MAX_FILE) { toast(f.name + ' is over ' + fmtSize(MAX_FILE) + ' (free database limit).'); sfx.error(); continue; }
+    next.push(f);
   }
-  p.style.display = file ? 'block' : 'none';
+  setPending(next);
 }
-$('fileIn').onchange = e => { const f = e.target.files[0]; e.target.value = ''; if (f) attachFile(f); };
-function attachFile(f){
-  if (!f.type.startsWith('image/') && f.size > MAX_FILE) { toast('Files can be up to ' + fmtSize(MAX_FILE) + ' on the free database.'); sfx.error(); return; }
-  setPending(f);
-}
-$('input').addEventListener('paste', e => { const it = [...(e.clipboardData ? e.clipboardData.items : [])].find(i => i.kind === 'file'); if (it) { e.preventDefault(); attachFile(it.getAsFile()); } });
+$('fileIn').onchange = e => { const fs = [...e.target.files]; e.target.value = ''; attachFiles(fs); };
+$('input').addEventListener('paste', e => {
+  const fs = [...(e.clipboardData ? e.clipboardData.items : [])].filter(i => i.kind === 'file').map(i => i.getAsFile()).filter(Boolean);
+  if (fs.length) { e.preventDefault(); attachFiles(fs); }
+});
 $('msgs').addEventListener('dragover', e => e.preventDefault());
-$('msgs').addEventListener('drop', e => { e.preventDefault(); if (e.dataTransfer.files[0] && $('composer').style.display !== 'none') attachFile(e.dataTransfer.files[0]); });
+$('msgs').addEventListener('drop', e => { e.preventDefault(); if (e.dataTransfer.files.length && $('composer').style.display !== 'none') attachFiles([...e.dataTransfer.files]); });
 
 async function sendMsg(){
   const input = $('input'), text = input.value.trim();
-  if (!text && !pendingFile) return;
+  if (!text && !pendingFiles.length) return;
   if (view.type === 'home') return;
-  if (text[0] === '/' && !pendingFile && isAdmin && view.type === 'srv' && await runCommand(text)) { input.value = ''; return; }
+  if (text[0] === '/' && !pendingFiles.length && isAdmin && view.type === 'srv' && await runCommand(text)) { input.value = ''; return; }
   if (Date.now() - lastSend < 600) return; lastSend = Date.now();
-  const btn = $('sendBtn'); btn.disabled = true;
+  const btn = $('sendBtn'), oldPh = input.placeholder; btn.disabled = true;
   try {
-    let fmeta = null;
-    if (pendingFile) { fmeta = await uploadFile(pendingFile); setPending(null); }
+    const metas = [], list = pendingFiles.slice();
+    for (let i = 0; i < list.length; i++) {
+      if (list.length > 1) input.placeholder = 'Uploading file ' + (i + 1) + ' of ' + list.length + '...';
+      metas.push(await uploadFile(list[i]));
+    }
+    input.placeholder = oldPh;
     const msg = {uid: me.uid, ts: TS};
     if (text) msg.text = text.slice(0, 500);
-    if (fmeta) msg.file = fmeta;
-    input.value = ''; sfx.send();
+    if (metas.length) msg.files = metas;
+    input.value = ''; setPending([]); sfx.send();
     if (view.type === 'srv') {
       msg.name = myProfile.name || me.name;
       await db.ref(msgPath(view.sid, view.cid)).push(msg);
     } else {
-      const other = view.uid, up = {};
-      const key = db.ref('dmChats/' + dmChatId(me.uid, other)).push().key;
-      up['dmChats/' + dmChatId(me.uid, other) + '/' + key] = msg;
+      const other = view.uid, up = {}, chat = dmChatId(me.uid, other);
+      const key = db.ref('dmChats/' + chat).push().key;
+      up['dmChats/' + chat + '/' + key] = msg;
       up['userDms/' + me.uid + '/' + other] = {ts: TS, from: me.uid};
       up['userDms/' + other + '/' + me.uid] = {ts: TS, from: me.uid};
       await db.ref().update(up);
     }
-  } catch (e) { sfx.error(); toast('Could not send: ' + e.message); }
+  } catch (e) { input.placeholder = oldPh; sfx.error(); toast('Could not send: ' + e.message); }
   btn.disabled = false;
 }
 $('input').addEventListener('keydown', e => { if (e.key === 'Enter') sendMsg(); });
