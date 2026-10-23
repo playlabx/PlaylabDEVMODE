@@ -6,8 +6,6 @@
     <title>PlayLab</title>
     <!-- Font Awesome for category icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Identity Services SDK -->
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <style>
         :root {
             --bg-color: #111113;
@@ -415,15 +413,7 @@
                 <!-- Favorites Filter Toggle -->
                 <i class="fas fa-heart" id="favFilterBtn" title="View Favorites" onclick="toggleFavoritesFilter()"></i>
 
-                <!-- Google Sign-In Button Container -->
-                <div id="g_id_onload"
-                     data-client_id="400040545159-d8siourd5gm4ehomkt1ca9lfoedfjkus.apps.googleusercontent.com"
-                     data-callback="handleCredentialResponse"
-                     data-auto_prompt="false">
-                </div>
-                <div class="g_id_signin" data-type="standard" data-theme="filled_black" data-size="medium" data-shape="pill"></div>
-
-                <!-- Logged-in User Profile -->
+                <!-- Logged-in User Profile (the Sign in button and Community icon are added automatically) -->
                 <div id="userProfile">
                     <img id="userAvatar" src="" alt="Avatar">
                     <span id="userName"></span>
@@ -458,10 +448,10 @@
             </div>
         </div>
         <div class="modal-content" id="modalContainer">
-            <iframe id="gameFrame" src="" allow="autoplay; fullscreen"></iframe>
+            <iframe id="gameFrame" src="" allow="autoplay; fullscreen; camera; microphone; display-capture; clipboard-write"></iframe>
         </div>
         <div class="close-container">
-            <span id="loginPromptNotice" style="font-size: 11px; color: var(--text-muted);">Sign in with Google to save favorites & leave comments!</span>
+            <span id="loginPromptNotice" style="font-size: 11px; color: var(--text-muted);">Sign in to save favorites and leave comments.</span>
             <button class="close-btn" onclick="closeGame()">Close Game</button>
         </div>
     </div>
@@ -520,7 +510,7 @@
 
         // Words/Games to block completely when Safe Mode is ON
         const blockedKeywords = ['gta', 'grand theft auto', 'fnaf', 'five nights'];
-        
+
         // Explicit words to replace/sanitize in text
         const profanityList = ['fuck', 'shit', 'bitch', 'ass', 'crap', 'bastard', 'theft'];
 
@@ -562,82 +552,13 @@
             return blockedKeywords.some(keyword => lowerTitle.includes(keyword) || lowerFile.includes(keyword));
         }
 
-        // Google Sign-In JWT Decoder & Handler
-        function parseJwt(token) {
-            try {
-                const base64Url = token.split('.')[1];
-                const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-                const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
-                return JSON.parse(jsonPayload);
-            } catch (e) {
-                return null;
-            }
-        }
-
-        function handleCredentialResponse(response) {
-            const payload = parseJwt(response.credential);
-            if (payload) {
-                const user = { name: payload.name, picture: payload.picture, email: payload.email };
-                localStorage.setItem('playlab_user', JSON.stringify(user));
-                updateUserUI(user);
-            }
-        }
-
-        function updateUserUI(user) {
-            const signinElem = document.querySelector('.g_id_signin');
-            const profileElem = document.getElementById('userProfile');
-            if (user) {
-                if (signinElem) signinElem.style.display = 'none';
-                profileElem.style.display = 'flex';
-                document.getElementById('userAvatar').src = user.picture;
-                document.getElementById('userName').innerText = sanitizeText(user.name);
-                document.getElementById('loginPromptNotice').innerText = "Logged in as " + sanitizeText(user.name) + "!";
-            } else {
-                if (signinElem) signinElem.style.display = 'block';
-                profileElem.style.display = 'none';
-                document.getElementById('loginPromptNotice').innerText = "Sign in with Google to save favorites!";
-            }
-        }
-
-        function logout() {
-            localStorage.removeItem('playlab_user');
-            updateUserUI(null);
-        }
-
-        function checkSavedUser() {
-            const saved = localStorage.getItem('playlab_user');
-            if (saved) {
-                updateUserUI(JSON.parse(saved));
-            }
-        }
-
-        // Favorites Handling
-        function getFavorites() {
-            try {
-                return JSON.parse(localStorage.getItem('playlab_favorites')) || [];
-            } catch (e) {
-                return [];
-            }
-        }
-
-        function toggleFavorite(filename, event) {
-            event.stopPropagation();
-            const user = localStorage.getItem('playlab_user');
-            if (!user) {
-                alert("Please sign in with Google to save favorites!");
-                return;
-            }
-
-            let favs = getFavorites();
-            const index = favs.indexOf(filename);
-            if (index > -1) {
-                favs.splice(index, 1);
-            } else {
-                favs.push(filename);
-            }
-            localStorage.setItem('playlab_favorites', JSON.stringify(favs));
-            renderGames(document.getElementById('searchBar').value);
-        }
+        // Accounts, favorites and comments are handled by the PlayLab social code at the bottom of this page.
+        // These stay here so the rest of the page can call them; the social code replaces them with real versions.
+        function updateUserUI() {}
+        function logout() {}
+        function checkSavedUser() {}
+        function getFavorites() { return []; }
+        function toggleFavorite(filename, event) { if (event) event.stopPropagation(); }
 
         function toggleFavoritesFilter() {
             showOnlyFavorites = !showOnlyFavorites;
@@ -747,6 +668,287 @@
         window.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') closeGame();
         });
+    </script>
+
+    <!-- PlayLab accounts, favorites and comments (Firebase) -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+    <script>
+/* PlayLab social add-on: real accounts, favorites that sync, and live comments.
+   Add it to the bottom of your games page (see the 4 lines in the instructions). */
+(function () {
+  const cfg = {
+    apiKey: "AIzaSyB0enAQRtWD-TAA1ewgaur30AG5t9BxyRY",
+    authDomain: "playlabyapper.firebaseapp.com",
+    databaseURL: "https://playlabyapper-default-rtdb.firebaseio.com",
+    projectId: "playlabyapper",
+    appId: "1:113983241575:web:4f383e844c02f30f5603c2"
+  };
+  if (!firebase.apps.length) firebase.initializeApp(cfg);
+  const auth = firebase.auth(), db = firebase.database(), TS = firebase.database.ServerValue.TIMESTAMP;
+  const FAKE = '@playlabyapper.app';
+  const IFRAME_ALLOW = 'autoplay; fullscreen; camera; microphone; display-capture; clipboard-write';
+  const $ = id => document.getElementById(id);
+  function h(tag, cls, text){ const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+  function gk(s){ return String(s).replace(/[.#$\/\[\]]/g, '_').slice(0, 60); }
+  function clean(t){ try { return sanitizeText(t); } catch(e){ return t; } }
+  function toast(msg){
+    let t = $('plToast'); if (!t) { t = h('div'); t.id = 'plToast'; document.body.appendChild(t); }
+    const n = h('div', 'pl-toast', msg); t.appendChild(n); setTimeout(() => n.remove(), 3500);
+  }
+  function avatarUrl(name){
+    const l = (name || '?').trim().charAt(0).toUpperCase();
+    return 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64"><rect width="64" height="64" fill="#f59e0b"/><text x="32" y="42" font-size="30" font-family="Arial" font-weight="700" text-anchor="middle" fill="#1a1a1e">' + l.replace(/[<>&]/g, '') + '</text></svg>');
+  }
+
+  /* ---------- styles ---------- */
+  const css = document.createElement('style');
+  css.textContent = `
+  #g_id_onload,.g_id_signin{display:none!important}
+  .pl-btn{background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;border:0;padding:7px 16px;border-radius:20px;font-weight:700;font-size:12px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+  .pl-btn:hover{filter:brightness(1.1)}
+  .pl-btn.ghost{background:#2c2c35;color:#fff}
+  .pl-btn.google{background:#fff;color:#1f1f1f;width:100%;justify-content:center;padding:11px;font-size:14px;border-radius:10px}
+  .pl-toast{background:#2c2c35;border:1px solid #3f3f46;color:#fff;padding:10px 16px;border-radius:10px;font-size:13px;margin-top:8px;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+  #plToast{position:fixed;left:50%;bottom:70px;transform:translateX(-50%);z-index:3000;display:flex;flex-direction:column;align-items:center;pointer-events:none}
+  .pl-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:2000;display:flex;align-items:center;justify-content:center;padding:16px}
+  .pl-card{background:#1a1a1e;border:1px solid #3f3f46;border-radius:16px;padding:24px;width:min(400px,100%);max-height:92vh;overflow:auto;color:#fff}
+  .pl-card h3{font-size:20px;margin-bottom:4px}
+  .pl-card .sub{color:#a1a1aa;font-size:13px;margin-bottom:16px;line-height:1.5}
+  .pl-card input{width:100%;background:#2c2c35;border:1px solid #3f3f46;color:#fff;border-radius:10px;padding:11px 13px;font-size:14px;outline:none;margin-bottom:10px}
+  .pl-card input:focus{border-color:#f59e0b}
+  .pl-row{display:flex;gap:10px}.pl-row .pl-btn{flex:1;justify-content:center;padding:11px;border-radius:10px;font-size:13px}
+  .pl-or{display:flex;align-items:center;gap:10px;color:#71717a;font-size:12px;margin:14px 0}
+  .pl-or::before,.pl-or::after{content:"";flex:1;height:1px;background:#3f3f46}
+  .pl-lnk{color:#fbbf24;font-size:13px;margin-top:14px;cursor:pointer;text-align:center}.pl-lnk:hover{text-decoration:underline}
+  .pl-err{color:#f87171;font-size:13px;min-height:16px;margin-top:10px;text-align:center}
+  #cmtPanel{position:fixed;top:0;right:0;bottom:0;width:min(370px,100vw);background:#1a1a1e;border-left:1px solid #3f3f46;z-index:1500;display:none;flex-direction:column;box-shadow:-10px 0 40px rgba(0,0,0,.5);color:#fff}
+  #cmtPanel .ch{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid #27272a;font-weight:700}
+  #cmtPanel .ch small{display:block;color:#a1a1aa;font-weight:400;font-size:11px}
+  #cmtPanel .cx{background:#2c2c35;border:0;color:#fff;width:30px;height:30px;border-radius:8px;cursor:pointer}
+  #cmtList{flex:1;overflow-y:auto;padding:12px 16px}
+  .cmt{margin-bottom:14px}
+  .cmt .top{display:flex;align-items:center;gap:8px;font-size:13px}
+  .cmt .nm{font-weight:700;color:#fbbf24}
+  .cmt .tm{font-size:11px;color:#71717a}
+  .cmt .dl{margin-left:auto;background:transparent;border:0;color:#ef4444;cursor:pointer;font-size:12px;opacity:.7}.cmt .dl:hover{opacity:1}
+  .cmt .tx{font-size:14px;line-height:1.45;margin-top:3px;white-space:pre-wrap;overflow-wrap:anywhere;color:#e4e4e7}
+  .cmt-empty{color:#71717a;text-align:center;padding:40px 10px;font-size:13px}
+  #cmtForm{border-top:1px solid #27272a;padding:12px 14px}
+  #cmtForm .box{display:flex;gap:8px}
+  #cmtForm input{flex:1;background:#2c2c35;border:1px solid #3f3f46;color:#fff;border-radius:10px;padding:10px 12px;font-size:14px;outline:none}
+  #cmtForm input:focus{border-color:#f59e0b}
+  #cmtForm .need{text-align:center;color:#a1a1aa;font-size:13px}
+  `;
+  document.head.appendChild(css);
+
+  /* ---------- state ---------- */
+  const st = {user: null, name: '', admin: false, favs: {}, favRef: null, panelKey: null, panelTitle: '', cmtQuery: null, lastPost: 0};
+  const eligible = u => !!u && ((u.email || '').endsWith(FAKE) || u.emailVerified);
+
+  /* ---------- header ---------- */
+  function setupHeader(){
+    const icons = document.querySelector('.header-icons'); if (!icons) return;
+    const signIn = h('button', 'pl-btn'); signIn.id = 'plSignIn'; signIn.innerHTML = '<i class="fas fa-user"></i> Sign in'; signIn.onclick = () => openAuth();
+    const board = h('i', 'fas fa-comments'); board.title = 'Community comments'; board.onclick = () => openPanel('__site__', 'Community');
+    icons.insertBefore(board, icons.firstChild);
+    icons.appendChild(signIn);
+    const cm = document.querySelector('.modal-controls');
+    if (cm) { const b = h('button', 'control-btn'); b.innerHTML = '<i class="fas fa-comments"></i> Comments'; b.onclick = () => { if (current.key) openPanel(current.key, current.title); }; cm.insertBefore(b, cm.firstChild); }
+    const fr = $('gameFrame'); if (fr) fr.setAttribute('allow', IFRAME_ALLOW);
+  }
+  function paintHeader(){
+    const p = $('userProfile'), s = $('plSignIn'); if (!p || !s) return;
+    if (st.user && eligible(st.user)) {
+      s.style.display = 'none'; p.style.display = 'flex';
+      $('userAvatar').src = st.user.photoURL || avatarUrl(st.name);
+      $('userName').textContent = clean(st.name);
+      const n = $('loginPromptNotice'); if (n) n.textContent = 'Signed in as ' + clean(st.name) + '. Favorites and comments are saved to your account.';
+    } else {
+      s.style.display = 'inline-flex'; p.style.display = 'none';
+      const n = $('loginPromptNotice'); if (n) n.textContent = 'Sign in to save favorites and leave comments.';
+    }
+  }
+
+  /* ---------- accounts ---------- */
+  async function onUser(user){
+    st.user = user;
+    if (st.favRef) { st.favRef.off(); st.favRef = null; }
+    st.favs = {}; st.admin = false;
+    if (!user) { paintHeader(); renderNow(); refreshComposer(); return; }
+    const fake = (user.email || '').endsWith(FAKE);
+    if (!fake && !user.emailVerified) { paintHeader(); openAuth(null, 'verify'); return; }
+    try { await user.getIdToken(true); } catch(e){}
+    let name = user.displayName || (user.email || '').split('@')[0] || 'player';
+    try { const p = await db.ref('profiles/' + user.uid + '/name').get(); if (p.exists()) name = p.val(); } catch(e){}
+    st.name = String(name).slice(0, 30);
+    try {
+      const a = await db.ref('admins/' + user.uid).get(); const r = await db.ref('usernames/ryvokex').get();
+      st.admin = a.val() === true || (r.exists() && r.val() === user.uid);
+    } catch(e){}
+    st.favRef = db.ref('userFavs/' + user.uid);
+    st.favRef.on('value', s => { st.favs = s.val() || {}; renderNow(); }, () => {});
+    closeAuth(); paintHeader(); refreshComposer();
+    if (st.panelKey) subscribe();
+  }
+  auth.onAuthStateChanged(onUser);
+  function renderNow(){ try { renderGames(($('searchBar') || {}).value || ''); } catch(e){} }
+
+  function friendly(e){
+    switch (e.code) {
+      case 'auth/email-already-in-use': return 'That email already has an account. Try logging in.';
+      case 'auth/invalid-email': return 'That email address looks wrong.';
+      case 'auth/invalid-credential': case 'auth/wrong-password': case 'auth/user-not-found': return 'Wrong email or password.';
+      case 'auth/weak-password': return 'Password is too weak. Use at least 6 characters.';
+      case 'auth/too-many-requests': return 'Too many tries. Wait a minute and try again.';
+      case 'auth/popup-closed-by-user': case 'auth/cancelled-popup-request': return '';
+      case 'auth/popup-blocked': return 'Your browser blocked the sign-in popup. Allow popups for this site.';
+      case 'auth/unauthorized-domain': return 'This site address is not allowed yet. Add it in Firebase > Authentication > Settings > Authorized domains.';
+      case 'auth/operation-not-allowed': return 'That sign-in method is not turned on in Firebase yet.';
+      case 'auth/network-request-failed': return 'No connection. Check your internet.';
+      default: return e.message || 'Something went wrong.';
+    }
+  }
+  function closeAuth(){ const o = $('plAuth'); if (o) o.remove(); }
+  function openAuth(msg, mode){
+    closeAuth();
+    mode = mode || 'login';
+    const o = h('div', 'pl-overlay'); o.id = 'plAuth';
+    const c = h('div', 'pl-card'); o.appendChild(c);
+    o.onclick = e => { if (e.target === o && mode !== 'verify') closeAuth(); };
+    const err = h('div', 'pl-err');
+    const say = t => { err.textContent = t || ''; };
+    if (mode === 'verify') {
+      c.appendChild(h('h3', null, 'Verify your email'));
+      const sub = h('div', 'sub'); sub.innerHTML = 'We sent a verification link to <b></b>. Open it (check your spam folder too), then press the button below.';
+      sub.querySelector('b').textContent = st.user ? st.user.email : ''; c.appendChild(sub);
+      const ok = h('button', 'pl-btn', 'I verified my email'); ok.style.cssText = 'width:100%;justify-content:center;padding:11px;border-radius:10px';
+      ok.onclick = async () => { try { await auth.currentUser.reload(); } catch(e){} if (auth.currentUser && auth.currentUser.emailVerified) onUser(auth.currentUser); else say('Not verified yet. Open the link in the email first.'); };
+      c.appendChild(ok);
+      const rs = h('div', 'pl-lnk', 'Resend the email'); rs.onclick = async () => { try { await auth.currentUser.sendEmailVerification(); toast('Verification email sent again.'); } catch(e){ say(friendly(e)); } }; c.appendChild(rs);
+      const out = h('div', 'pl-lnk', 'Use a different account'); out.onclick = () => { auth.signOut(); closeAuth(); }; c.appendChild(out);
+      c.appendChild(err); document.body.appendChild(o); return;
+    }
+    const signup = mode === 'signup';
+    c.appendChild(h('h3', null, signup ? 'Create your account' : 'Sign in to PlayLab'));
+    c.appendChild(h('div', 'sub', msg || 'Save favorites and leave comments. Your account works across your devices.'));
+    const g = h('button', 'pl-btn google'); g.innerHTML = '<i class="fab fa-google"></i> Continue with Google';
+    g.onclick = async () => { say(''); try { await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); } catch(e){ say(friendly(e)); } };
+    c.appendChild(g); c.appendChild(h('div', 'pl-or', 'or use your email'));
+    let dn = null;
+    if (signup) { dn = h('input'); dn.placeholder = 'Display name'; dn.maxLength = 20; c.appendChild(dn); }
+    const em = h('input'); em.type = 'email'; em.placeholder = 'Email'; em.autocomplete = 'email'; c.appendChild(em);
+    const pw = h('input'); pw.type = 'password'; pw.placeholder = 'Password (6+ characters)'; pw.autocomplete = signup ? 'new-password' : 'current-password'; c.appendChild(pw);
+    const go = h('button', 'pl-btn', signup ? 'Sign up' : 'Log in'); go.style.cssText = 'width:100%;justify-content:center;padding:11px;border-radius:10px';
+    go.onclick = async () => {
+      say(''); const email = em.value.trim(), pass = pw.value;
+      if (!email || pass.length < 6) { say('Enter your email and a password of at least 6 characters.'); return; }
+      if (email.toLowerCase().endsWith(FAKE)) { say('Use a real email address.'); return; }
+      go.disabled = true;
+      try {
+        if (signup) {
+          const name = (dn.value || '').trim(); if (name.length < 2) { say('Pick a display name (2+ characters).'); go.disabled = false; return; }
+          const cr = await auth.createUserWithEmailAndPassword(email, pass);
+          await cr.user.updateProfile({displayName: name}); await cr.user.sendEmailVerification();
+        } else await auth.signInWithEmailAndPassword(email, pass);
+      } catch (e) { say(friendly(e)); }
+      go.disabled = false;
+    };
+    pw.onkeydown = e => { if (e.key === 'Enter') go.click(); };
+    c.appendChild(go);
+    if (!signup) { const f = h('div', 'pl-lnk', 'Forgot password?'); f.onclick = async () => { if (!em.value.trim()) { say('Type your email first.'); return; } try { await auth.sendPasswordResetEmail(em.value.trim()); toast('Password reset email sent. Check spam too.'); } catch(e){ say(friendly(e)); } }; c.appendChild(f); }
+    const sw = h('div', 'pl-lnk', signup ? 'Already have an account? Log in' : 'New here? Create an account'); sw.onclick = () => openAuth(null, signup ? 'login' : 'signup'); c.appendChild(sw);
+    c.appendChild(err); document.body.appendChild(o);
+  }
+  window.PlayLabSocial = {openAuth};
+
+  /* ---------- favorites (replace the old fake local ones) ---------- */
+  window.getFavorites = function(){ return Object.keys(gameConfig).filter(f => st.favs[gk(f)]); };
+  window.toggleFavorite = function(filename, event){
+    if (event) event.stopPropagation();
+    if (!eligible(st.user)) { openAuth('Sign in to save your favorite games.'); return; }
+    const k = gk(filename), r = db.ref('userFavs/' + st.user.uid + '/' + k);
+    if (st.favs[k]) { delete st.favs[k]; r.remove().catch(e => toast('Could not save: ' + e.message)); }
+    else { st.favs[k] = true; r.set(true).catch(e => toast('Could not save: ' + e.message)); }
+    renderNow();
+  };
+  window.handleCredentialResponse = function(){};
+  window.updateUserUI = function(){};
+  window.checkSavedUser = function(){};
+  window.logout = function(){ auth.signOut(); };
+
+  /* ---------- comments ---------- */
+  const current = {key: null, title: ''};
+  function buildPanel(){
+    const p = h('div'); p.id = 'cmtPanel';
+    p.innerHTML = '<div class="ch"><div><span id="cmtTitle"></span><small>Live comments. Be nice.</small></div><button class="cx" id="cmtClose"><i class="fas fa-times"></i></button></div><div id="cmtList"></div><div id="cmtForm"></div>';
+    document.body.appendChild(p);
+    $('cmtClose').onclick = closePanel;
+  }
+  function refreshComposer(){
+    const f = $('cmtForm'); if (!f) return; f.innerHTML = '';
+    if (!eligible(st.user)) {
+      const n = h('div', 'need'); n.textContent = 'Sign in to join the conversation. '; const b = h('button', 'pl-btn', 'Sign in'); b.style.marginTop = '8px'; b.onclick = () => openAuth('Sign in to leave a comment.'); n.appendChild(h('br')); n.appendChild(b); f.appendChild(n); return;
+    }
+    const box = h('div', 'box'), i = h('input'); i.maxLength = 300; i.placeholder = 'Write a comment...'; const b = h('button', 'pl-btn', 'Post');
+    const send = async () => {
+      const t = i.value.trim(); if (!t) return;
+      if (Date.now() - st.lastPost < 3000) { toast('Slow down a little.'); return; }
+      st.lastPost = Date.now(); i.value = '';
+      try { await db.ref('comments/' + st.panelKey).push({uid: st.user.uid, name: st.name, text: t.slice(0, 300), ts: TS}); }
+      catch (e) { toast('Could not post: ' + e.message); }
+    };
+    b.onclick = send; i.onkeydown = e => { if (e.key === 'Enter') send(); };
+    box.append(i, b); f.appendChild(box);
+  }
+  function openPanel(key, title){
+    if (!$('cmtPanel')) buildPanel();
+    st.panelKey = key; st.panelTitle = title;
+    $('cmtTitle').textContent = title; $('cmtPanel').style.display = 'flex';
+    refreshComposer(); subscribe();
+  }
+  function closePanel(){
+    if (st.cmtQuery) { st.cmtQuery.off(); st.cmtQuery = null; }
+    st.panelKey = null; const p = $('cmtPanel'); if (p) p.style.display = 'none';
+  }
+  function subscribe(){
+    if (st.cmtQuery) { st.cmtQuery.off(); st.cmtQuery = null; }
+    const list = $('cmtList'); list.innerHTML = '';
+    const key = st.panelKey, q = db.ref('comments/' + key).orderByChild('ts').limitToLast(100); st.cmtQuery = q;
+    let any = false;
+    q.on('child_added', s => {
+      const m = s.val(); if (!m || typeof m.text !== 'string') return;
+      if (!any) { any = true; list.innerHTML = ''; }
+      const atBottom = list.scrollHeight - list.scrollTop - list.clientHeight < 80;
+      const c = h('div', 'cmt'); c.id = 'c_' + s.key;
+      const top = h('div', 'top'); top.appendChild(h('span', 'nm', clean(m.name || 'player')));
+      top.appendChild(h('span', 'tm', new Date(m.ts || Date.now()).toLocaleString([], {month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit'})));
+      if (st.user && (m.uid === st.user.uid || st.admin)) {
+        const d = h('button', 'dl'); d.innerHTML = '<i class="fas fa-trash"></i>'; d.title = 'Delete';
+        d.onclick = () => db.ref('comments/' + key + '/' + s.key).remove().catch(e => toast('Could not delete: ' + e.message)); top.appendChild(d);
+      }
+      c.appendChild(top); c.appendChild(h('div', 'tx', clean(m.text)));
+      list.appendChild(c); if (atBottom || (st.user && m.uid === st.user.uid)) list.scrollTop = list.scrollHeight;
+    }, err => { list.innerHTML = ''; list.appendChild(h('div', 'cmt-empty', 'Could not load comments: ' + err.message)); });
+    q.on('child_removed', s => { const el = $('c_' + s.key); if (el) el.remove(); });
+    q.once('value').then(s => { if (!s.exists()) { list.innerHTML = ''; list.appendChild(h('div', 'cmt-empty', 'No comments yet. Be the first!')); } });
+  }
+
+  /* ---------- hook into the page's existing game functions ---------- */
+  const _open = window.openGame, _close = window.closeGame, _safe = window.toggleSafeMode;
+  window.openGame = function (url, title) {
+    const fr = $('gameFrame'); if (fr) fr.setAttribute('allow', IFRAME_ALLOW);   // lets Yapper use mic, camera and screen share
+    current.key = gk(url); current.title = title;
+    _open(url, title);
+    if (st.panelKey && st.panelKey !== '__site__') openPanel(current.key, title);
+  };
+  window.closeGame = function () { _close(); closePanel(); current.key = null; };
+  window.toggleSafeMode = function () { _safe(); if (st.panelKey) subscribe(); paintHeader(); };
+
+  setupHeader(); paintHeader();
+})();
+
     </script>
 </body>
 </html>
