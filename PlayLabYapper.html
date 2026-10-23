@@ -204,6 +204,90 @@
 </head>
 <body>
 
+  <!-- START: Watermark & Overlay Block -->
+<style>
+  /* Watermark Styling */
+  .bg-watermark {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-30deg);
+    font-size: 15vw;
+    font-weight: 900;
+    font-family: Arial, sans-serif;
+    color: rgba(0, 0, 0, 0.15); /* Adjust opacity here */
+    user-select: none;
+    pointer-events: none;
+    z-index: 9998;
+    white-space: nowrap;
+    text-transform: uppercase;
+  }
+
+  /* Full Screen Non-Exitable Overlay */
+  .overlay-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.85); /* Dark translucent backdrop */
+    backdrop-filter: blur(5px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    gap: 20px;
+    font-family: Arial, sans-serif;
+  }
+
+  /* Un-exitable Button (Disabled) */
+  .btn-warning {
+    padding: 15px 30px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #ffffff;
+    background-color: #e74c3c;
+    border: none;
+    border-radius: 8px;
+    cursor: not-allowed;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Link Button */
+  .btn-link {
+    padding: 12px 24px;
+    font-size: 1rem;
+    font-weight: bold;
+    color: #ffffff;
+    background-color: #3498db;
+    text-decoration: none;
+    border-radius: 6px;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  }
+
+  .btn-link:hover {
+    background-color: #2980b9;
+    transform: translateY(-2px);
+  }
+</style>
+
+<!-- Watermark -->
+<div class="bg-watermark">RYVOKEX</div>
+
+<!-- Overlay Container -->
+<div class="overlay-container">
+  <!-- Locked / Disabled Button -->
+  <button class="btn-warning" disabled>This client is to new!</button>
+
+  <!-- Redirect Button -->
+  <a class="btn-link" href="https://vrstheft.github.io/Playlab/PlayLabYapper.html">
+    Go to PlayLab Yapper
+  </a>
+</div>
+<!-- END: Watermark & Overlay Block -->
+
 <div id="loading">Loading...</div>
 
 <div id="login">
