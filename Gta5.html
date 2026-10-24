@@ -191,13 +191,17 @@
 
     <script>
         const targetUrl = "https://solve5.playgta5.net/?mode=sandbox";
-        const proxyUrl = "https://api.allorigins.win/raw?url=" + encodeURIComponent(targetUrl);
+        
+        // corsproxy.io URL format including your authenticated API key
+        const proxyUrl = "https://corsproxy.io/?key=5a19d29c&url=" + encodeURIComponent(targetUrl);
 
         const logBox = document.getElementById('log-box');
         const progressBar = document.getElementById('progress-bar');
         const percentText = document.getElementById('percent-text');
         const gameFrame = document.getElementById('game-frame');
         const loaderOverlay = document.getElementById('loader-overlay');
+
+        let isFinished = false;
 
         function addLog(message, type = 'info') {
             const time = new Date().toLocaleTimeString().split(' ')[0];
@@ -213,47 +217,68 @@
             percentText.textContent = Math.round(percent) + '%';
         }
 
-        // Initialize connection logs
-        addLog('Initializing secure proxy bridge...', 'info');
-        setProgress(15);
+        function completeLoading() {
+            if (isFinished) return;
+            isFinished = true;
 
-        setTimeout(() => {
-            addLog(`Target URL: ${targetUrl}`, 'info');
-            setProgress(35);
-        }, 300);
-
-        setTimeout(() => {
-            addLog('Bypassing X-Frame-Options via AllOrigins API...', 'warn');
-            setProgress(60);
-            
-            // Set source to iframe
-            gameFrame.src = proxyUrl;
-        }, 700);
-
-        // Track Frame Load State
-        gameFrame.addEventListener('load', () => {
-            addLog('Proxy handshake successful!', 'success');
-            addLog('Rendering sandbox environment...', 'success');
             setProgress(100);
+            addLog('Stream active. Displaying sandbox environment...', 'success');
 
-            // Hide loading screen smoothly
             setTimeout(() => {
                 gameFrame.classList.add('loaded');
                 loaderOverlay.classList.add('hidden');
-            }, 600);
+            }, 500);
+        }
+
+        // Phase 1: Proxy initialization
+        addLog('Initializing GTA 5 proxy bridge...', 'info');
+        setProgress(10);
+
+        setTimeout(() => {
+            addLog(`Target URL loaded with API authentication`, 'info');
+            setProgress(25);
+        }, 300);
+
+        setTimeout(() => {
+            addLog('Authenticating via corsproxy.io API...', 'warn');
+            setProgress(40);
+            
+            // Inject stream source into iframe
+            gameFrame.src = proxyUrl;
+        }, 700);
+
+        // Phase 2: Engine warmup sequence (covers the 10s grey screen delay)
+        gameFrame.addEventListener('load', () => {
+            addLog('Proxy handshake successful!', 'success');
+            addLog('Initializing RAGE engine assets & textures...', 'info');
+            setProgress(55);
+
+            // Staggered logs across the ~10 second load buffer
+            setTimeout(() => {
+                addLog('Allocating sandbox memory buffers...', 'info');
+                setProgress(70);
+            }, 2500);
+
+            setTimeout(() => {
+                addLog('Configuring viewport & audio context...', 'info');
+                setProgress(85);
+            }, 5500);
+
+            setTimeout(() => {
+                addLog('Finalizing rendering pipeline...', 'info');
+                setProgress(95);
+            }, 8500);
+
+            // Hide overlay completely after 10.5 seconds
+            setTimeout(() => {
+                completeLoading();
+            }, 10500);
         });
 
-        // Backup timer in case the iframe load event delays
+        // Fallback safety timeout if 'load' event fires slowly
         setTimeout(() => {
-            if (!loaderOverlay.classList.contains('hidden')) {
-                addLog('Stream connected. Displaying viewport...', 'info');
-                setProgress(100);
-                setTimeout(() => {
-                    gameFrame.classList.add('loaded');
-                    loaderOverlay.classList.add('hidden');
-                }, 500);
-            }
-        }, 5000);
+            completeLoading();
+        }, 18000);
     </script>
 
 </body>
